@@ -184,3 +184,7 @@ Notes:
   the links endpoint for the sitemap, draft mode, cache invalidation.
 - Run the generator after every schema change, and run the tests (add Pest or PHPUnit feature tests for the routes).
 - Ask before adding dependencies beyond Laravel, Bootstrap, Vite and the package's own requirements.
+- Never commit directly to `main`. Create a branch first.
+- Always write commit messages as [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): description`
+  with types such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`. Imperative, lowercase subject,
+  no trailing period.
