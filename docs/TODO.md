@@ -20,14 +20,15 @@ Strike through or delete an item when it is done.
   docs. Confirm with a real delivery from Storyblok.
 - **Visual Editor.** Draft mode was tested with signed URLs and in a browser, never inside the real editor iframe.
 - **Real devices.** The mobile pass used browser emulation only.
-- **Storyblok image service.** Open Graph images are resized by appending `/m/1200x630` to the asset URL. This is not
-  yet confirmed against a real asset, because the space has no images.
+- ~~Storyblok image service.~~ Confirmed with the author's avatar: a 2400x2400 original requested as `/m/192x192`
+  comes back as 192x192. The Open Graph images (`/m/1200x630`) use the same mechanism, but a post with a cover or
+  `og_image` has not been looked at in a real social card preview yet.
 
 ## 3. Gaps against the goal of testing the package
 
 - **Datasources and languages are unused.** Tags show as raw slugs (`#php`) instead of the names in the `tags`
   datasource. A tag page or a second language would exercise both.
-- **`FRICTION.md` has 19 entries.** Turn the most useful into issues or a PR on `tuxonice/storyblok-transfers`. Top five:
+- **`FRICTION.md` has 20 entries.** Turn the most useful into issues or a PR on `tuxonice/storyblok-transfers`. Top five:
   1. keep `_editable` and `_uid` on transfers,
   2. merge per-call options onto the defaults,
   3. a `getRelations()` helper,
@@ -42,9 +43,10 @@ Strike through or delete an item when it is done.
 - ~~404 and error pages.~~ Designed. 404 and other client errors use the site layout (with static fallback settings if
   Storyblok is down); 500 and 503 are a standalone page with no Storyblok or assets, so they cannot fail for the same
   reason the site just did.
-- **Still undesigned.** There is no author page, no search and no tag pages.
-- **Author data.** The author card is plain: `avatar`, `website` and `github` are stored but not shown, and it does
-  not link anywhere.
+- ~~Author page and author data.~~ `/authors/{slug}` shows the avatar (or initials), role, bio, website and GitHub
+  links, and the author's posts with pagination. The post's author name and card link to it, and it is in the sitemap
+  with Person JSON-LD.
+- **Still undesigned.** There is no search and no tag pages, and no authors index (`~/authors` is not a link).
 - **Reading time.** Every listing loads each post's full body to compute it (`FRICTION.md` entry 6). Storing it as a
   field would avoid that.
 - **No `/posts` page.** The `~/posts` breadcrumb and the "all posts" link both go to the home page.

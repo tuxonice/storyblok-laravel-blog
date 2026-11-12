@@ -67,30 +67,10 @@ final readonly class SeoMeta
         return rtrim($cut, " \t,.;:-").'…';
     }
 
-    /**
-     * An absolute image URL sized for social cards. Storyblok assets are resized by its
-     * image service (`/m/1200x630`); anything else, SVGs and already-resized URLs are
-     * left alone. Returns null for anything that is not an absolute http(s) URL.
-     */
+    /** An absolute image URL sized for social cards (1200x630), or null. See Image::resize(). */
     public static function image(?string $url): ?string
     {
-        $url = trim((string) $url);
-
-        if (! preg_match('~^https?://~i', $url)) {
-            return null;
-        }
-
-        $parts = parse_url($url);
-        $host = strtolower($parts['host'] ?? '');
-        $path = $parts['path'] ?? '';
-
-        $onStoryblok = $host === 'storyblok.com' || str_ends_with($host, '.storyblok.com');
-
-        if (! $onStoryblok || str_contains($path, '/m/') || str_ends_with(strtolower($path), '.svg')) {
-            return $url;
-        }
-
-        return $parts['scheme'].'://'.$host.$path.'/m/'.self::IMAGE_WIDTH.'x'.self::IMAGE_HEIGHT.(isset($parts['query']) ? '?'.$parts['query'] : '');
+        return Image::resize($url, self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
     }
 
     /**
@@ -125,6 +105,36 @@ final readonly class SeoMeta
                 'keywords' => $post['tags'] === [] ? null : implode(', ', $post['tags']),
                 'author' => $post['author']['name'] !== '' ? ['@type' => 'Person', 'name' => $post['author']['name']] : null,
                 'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical],
+            ], fn ($v) => $v !== null),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $author  As shaped by Blog::authorView().
+     */
+    public static function forAuthor(array $author, string $canonical, string $siteName, ?string $fallbackImage): self
+    {
+        $description = self::describe($author['bio'] ?: "Posts by {$author['name']}.");
+        $avatar = Image::resize($author['avatar'] ?? null, 400, 400);
+        $sameAs = array_values(array_filter([$author['website']['url'] ?? null, $author['github']['url'] ?? null]));
+
+        return new self(
+            title: self::title($author['name'], $siteName),
+            description: $description,
+            canonical: $canonical,
+            siteName: $siteName,
+            type: 'profile',
+            image: self::image($fallbackImage),
+            imageAlt: $siteName,
+            jsonLd: array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'Person',
+                'name' => $author['name'],
+                'jobTitle' => $author['role'] !== '' ? $author['role'] : null,
+                'description' => $description,
+                'image' => $avatar,
+                'url' => $canonical,
+                'sameAs' => $sameAs === [] ? null : $sameAs,
             ], fn ($v) => $v !== null),
         );
     }

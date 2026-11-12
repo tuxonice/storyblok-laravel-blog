@@ -1,6 +1,7 @@
 <?php
 
 use App\Blog\DraftMode;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
@@ -19,6 +20,7 @@ Route::middleware(DetectDraftMode::class)->group(function () {
     Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::get('/authors/{slug}', [AuthorController::class, 'show'])->name('authors.show');
     Route::get('/about', [PageController::class, 'about'])->name('about');
 
     // The Visual Editor previews a story at its slug: send the stories without a page of their own to the home page,

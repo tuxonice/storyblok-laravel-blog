@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(Blog::class);
 
         View::composer(
-            ['layouts.app', 'home.index', 'posts.show', 'categories.index', 'categories.show', 'pages.about'],
+            ['layouts.app', 'home.index', 'posts.show', 'categories.index', 'categories.show', 'authors.show', 'pages.about'],
             function ($view) {
                 // An error page supplies its own (failure-tolerant) site settings.
                 $site = $view->getData()['site'] ?? app(Blog::class)->site();

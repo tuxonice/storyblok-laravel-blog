@@ -7,8 +7,12 @@
     </nav>
     <h1 class="post-title mb-3">{{ $post['title'] }}</h1>
     <div class="meta-row meta-mono mb-4">
-        <span class="avatar" aria-hidden="true">{{ $post['author']['initials'] }}</span>
-        <span>{{ $post['author']['name'] }}</span>
+        <x-avatar :author="$post['author']" />
+        @if ($post['author']['slug'])
+            <a href="{{ route('authors.show', $post['author']['slug']) }}">{{ $post['author']['name'] }}</a>
+        @else
+            <span>{{ $post['author']['name'] }}</span>
+        @endif
         <span>{{ $post['date']->format('Y-m-d') }}</span>
         <span>{{ $post['minutes'] }} min read</span>
         <span><x-tags :tags="$post['tags']" /></span>
@@ -35,9 +39,18 @@
     </div>
 
     <div class="author-card my-5">
-        <span class="avatar lg" aria-hidden="true">{{ $post['author']['initials'] }}</span>
+        <x-avatar :author="$post['author']" size="lg" />
         <div>
-            <div class="name">{{ $post['author']['name'] }}</div>
+            <div class="name">
+                @if ($post['author']['slug'])
+                    <a href="{{ route('authors.show', $post['author']['slug']) }}">{{ $post['author']['name'] }}</a>
+                @else
+                    {{ $post['author']['name'] }}
+                @endif
+            </div>
+            @if ($post['author']['role'] !== '')
+                <div class="meta-mono">{{ $post['author']['role'] }}</div>
+            @endif
             <p>{{ $post['author']['bio'] }}</p>
         </div>
     </div>

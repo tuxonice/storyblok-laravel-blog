@@ -603,6 +603,31 @@ pre,
 }
 
 // ---------------------------------------------------------------------------
+// Author page
+// ---------------------------------------------------------------------------
+.author-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1rem;
+
+    .eyebrow {
+        margin-bottom: 0.25rem;
+    }
+
+    .page-title {
+        margin-bottom: 0.25rem;
+    }
+}
+
+.author-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+// ---------------------------------------------------------------------------
 // Error pages
 // ---------------------------------------------------------------------------
 .error-page {
@@ -658,6 +683,13 @@ pre,
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem 1rem;
+
+    a {
+        color: var(--tb-text);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
 }
 
 .avatar {
@@ -674,10 +706,18 @@ pre,
     color: var(--tb-text);
     flex: none;
 
+    object-fit: cover; // for the <img> variant
+
     &.lg {
         width: 56px;
         height: 56px;
         font-size: 1rem;
+    }
+
+    &.xl {
+        width: 96px;
+        height: 96px;
+        font-size: 1.5rem;
     }
 }
 
@@ -877,6 +917,13 @@ pre,
 
     .name {
         font-weight: 600;
+
+        a {
+            color: var(--tb-text);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
     }
 
     p {

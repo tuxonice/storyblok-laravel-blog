@@ -9,7 +9,7 @@ written down in [`FRICTION.md`](FRICTION.md) with a suggested change to the pack
 
 **What it does**
 
-- Home, post, category, about and category-index pages, read from Storyblok with relations (author, categories).
+- Home, post, category, author, about and category-index pages, read from Storyblok with relations (author, categories).
 - Richtext with embedded blocks (code, callout, pull quote, figure), heading anchors and an "on this page" index.
 - Server-side syntax highlighting for both themes, reading time, RSS feed, sitemap and `robots.txt`.
 - SEO: meta description, canonical URLs, Open Graph, Twitter cards and JSON-LD.

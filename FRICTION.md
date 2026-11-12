@@ -169,6 +169,17 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** accept `Psr\Http\Client\ClientInterface` (PSR-18) plus a PSR-17 request factory, which also removes
   the hard Guzzle dependency.
 
+## 20. The filter operator depends on the field type, and the wrong one silently returns nothing
+
+- **Tried:** list an author's posts with `filterQuery`, as the category page already does.
+- **Happened:** categories are a multi-reference field and need `any_in_array`; the author is a single reference and
+  needs `in`. Using `any_in_array` on the author field is not an error: against the real space it returned 0 posts, the
+  same as a uuid that matches nothing. Only a live check (5 posts with `in`, 0 with `any_in_array`) showed which is right.
+- **Did instead:** `Blog::author()` uses `in`, with a comment, and the test fake implements both operators the way
+  Storyblok behaves, so the two cannot be confused in tests.
+- **Suggestion:** typed helpers on `StoryQuery` that pick the operator, such as `whereReference('author', $uuid)` and
+  `whereAnyReference('categories', $uuid)`, instead of a raw `array<string, array<string, string>>`.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

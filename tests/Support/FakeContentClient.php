@@ -10,7 +10,7 @@ use Tlab\StoryblokTransfers\Client\ResourceNotFoundException;
  * An in-memory Content Delivery API built from storyblok/stories/stories.json,
  * so route tests read the same content as the real space without the network.
  * Supports what the app uses: story by slug or uuid, listings (starts_with,
- * sort_by, page, per_page, filter_query any_in_array), resolve_relations and
+ * sort_by, page, per_page, filter_query in/any_in_array), resolve_relations and
  * the links tree.
  */
 class FakeContentClient implements ContentClient
@@ -142,6 +142,8 @@ class FakeContentClient implements ContentClient
 
             $ok = match ($operation) {
                 'any_in_array' => count(array_intersect((array) $actual, explode(',', $value))) > 0,
+                // Storyblok's `in` is for a single value (a single reference or option), not a list field.
+                'in' => ! is_array($actual) && in_array((string) $actual, explode(',', $value), true),
                 default => throw new \LogicException("FakeContentClient does not support the {$operation} filter."),
             };
 

@@ -123,7 +123,7 @@ class RichtextRenderer
     /** @param  array<string, mixed>  $attrs */
     private function link(array $attrs, string $inner): string
     {
-        $href = $this->safeHref((string) ($attrs['href'] ?? ''), (string) ($attrs['linktype'] ?? ''));
+        $href = SafeUrl::href((string) ($attrs['href'] ?? ''), (string) ($attrs['linktype'] ?? ''));
 
         if ($href === null) {
             return $inner;
@@ -132,27 +132,6 @@ class RichtextRenderer
         $external = ($attrs['target'] ?? null) === '_blank';
 
         return '<a href="'.e($href).'"'.($external ? ' target="_blank" rel="noopener noreferrer"' : '').">{$inner}</a>";
-    }
-
-    private function safeHref(string $href, string $linktype): ?string
-    {
-        $href = trim($href);
-
-        if ($href === '') {
-            return null;
-        }
-
-        if ($linktype === 'email' && ! str_starts_with($href, 'mailto:')) {
-            $href = 'mailto:'.$href;
-        }
-
-        // Relative paths and anchors, or an explicit safe scheme. Everything else
-        // (javascript:, data:, vbscript:, protocol-relative //host) is dropped.
-        if (preg_match('~^(?:/(?!/)|#)~', $href) || preg_match('~^(?:https?|mailto|tel):~i', $href)) {
-            return $href;
-        }
-
-        return null;
     }
 
     /** @param  array<string, mixed>  $node */

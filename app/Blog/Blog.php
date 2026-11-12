@@ -108,6 +108,43 @@ class Blog
     }
 
     /** @return array<string, mixed>|null */
+    public function author(string $slug, int $page): ?array
+    {
+        $story = $this->storyblok->stories()->bySlug('authors/'.$slug, AuthorTransfer::class, $this->options());
+
+        if ($story === null) {
+            return null;
+        }
+
+        $perPage = $this->postsPerPage();
+        $list = $this->storyblok->stories()->findBy(new StoryQuery(
+            startsWith: 'posts/',
+            sortBy: 'content.published_at:desc',
+            // A single reference field: `in`. (The multi-reference categories need `any_in_array`.)
+            filterQuery: ['author' => ['in' => $story->getUuid()]],
+            page: max(1, $page),
+            perPage: $perPage,
+            options: $this->options(),
+        ), PostTransfer::class);
+
+        $posts = array_map(fn (StoryTransfer $s) => $this->post($s), $list->getStories());
+
+        // A page past the end is a 404; an author with no posts yet is still a valid page.
+        if ($posts === [] && $page > 1) {
+            return null;
+        }
+
+        return [
+            'author' => $this->authorView($story->getContent(), $story->getSlug(), $story->getName()),
+            'posts' => $posts,
+            'total' => $list->getTotal(),
+            'page' => $list->getPage(),
+            'hasNewer' => $list->getPage() > 1,
+            'hasOlder' => $list->getPage() * $perPage < $list->getTotal(),
+        ];
+    }
+
+    /** @return array<string, mixed>|null */
     public function category(string $slug, int $page): ?array
     {
         $story = $this->storyblok->stories()->bySlug('categories/'.$slug, CategoryTransfer::class, $this->options());
@@ -215,8 +252,8 @@ class Blog
 
             $path = '/'.ltrim($link->getSlug(), '/');
 
-            // Only slugs the app has a route for: posts, categories and the about page.
-            if ($path === '/about' || str_starts_with($path, '/posts/') || str_starts_with($path, '/categories/')) {
+            // Only slugs the app has a route for: posts, categories, authors and the about page.
+            if ($path === '/about' || str_starts_with($path, '/posts/') || str_starts_with($path, '/categories/') || str_starts_with($path, '/authors/')) {
                 $entries[] = ['path' => $path, 'lastmod' => $lastmod[$path] ?? null];
             }
         }
@@ -300,8 +337,7 @@ class Blog
         $body = $this->richtext->render($post->getBody());
 
         $author = $story->getRelation($post->getAuthor());
-        $authorContent = $author instanceof StoryTransfer ? $author->getContent() : null;
-        $name = $authorContent instanceof AuthorTransfer ? (string) $authorContent->getName() : '';
+        $authorContent = $author instanceof StoryTransfer && $author->getContent() instanceof AuthorTransfer ? $author->getContent() : null;
 
         $categories = [];
         foreach ($post->getCategories() as $uuid) {
@@ -320,12 +356,7 @@ class Blog
             'tags' => $post->getTags(),
             'categories' => $categories,
             'cover' => $post->getCoverImage()?->getFilename() ?: null,
-            'author' => [
-                'name' => $name,
-                'initials' => $this->initials($name),
-                'role' => (string) ($authorContent?->getRole()),
-                'bio' => (string) ($authorContent?->getBio()),
-            ],
+            'author' => $this->authorView($authorContent, $author instanceof StoryTransfer ? $author->getSlug() : null, $author instanceof StoryTransfer ? $author->getName() : null),
             'body' => $body->html,
             'headings' => $body->headings,
             'seoTitle' => (string) $post->getSeoTitle(),
@@ -367,10 +398,53 @@ class Blog
     {
         return match ($link?->getLinktype()) {
             'story' => '/'.ltrim((string) $link->getCachedUrl(), '/'),
-            'url' => $link->getUrl() ?: $link->getCachedUrl() ?: null,
-            'email' => $link->getUrl() ? 'mailto:'.$link->getUrl() : null,
+            'url' => SafeUrl::href($link->getUrl() ?: $link->getCachedUrl(), 'url'),
+            'email' => SafeUrl::href($link->getUrl(), 'email'),
             default => null,
         };
+    }
+
+    /**
+     * @return array{slug: ?string, name: string, initials: string, role: string, bio: string, avatar: ?string, website: ?array{url: string, label: string}, github: ?array{url: string, label: string}}
+     */
+    private function authorView(?AuthorTransfer $author, ?string $slug, ?string $storyName = null): array
+    {
+        $name = (string) ($author?->getName() ?: $storyName);
+
+        return [
+            'slug' => $slug,
+            'name' => $name,
+            'initials' => $this->initials($name),
+            'role' => (string) $author?->getRole(),
+            'bio' => (string) $author?->getBio(),
+            'avatar' => Image::url($author?->getAvatar()?->getFilename()),
+            'website' => $this->website($author),
+            'github' => $this->github($author),
+        ];
+    }
+
+    /** @return array{url: string, label: string}|null */
+    private function website(?AuthorTransfer $author): ?array
+    {
+        $url = $this->href($author?->getWebsite());
+
+        if ($url === null || ! str_starts_with($url, 'http')) {
+            return null;
+        }
+
+        return ['url' => $url, 'label' => preg_replace('/^www\./', '', (string) parse_url($url, PHP_URL_HOST)) ?: $url];
+    }
+
+    /** The GitHub field is free text: a profile URL or just a handle. */
+    private function github(?AuthorTransfer $author): ?array
+    {
+        $value = trim((string) $author?->getGithub());
+
+        if (preg_match('~^https://github\.com/([A-Za-z0-9][A-Za-z0-9-]{0,38})/?$~i', $value, $m) || preg_match('~^@?([A-Za-z0-9][A-Za-z0-9-]{0,38})$~', $value, $m)) {
+            return ['url' => 'https://github.com/'.$m[1], 'label' => 'github.com/'.$m[1]];
+        }
+
+        return null;
     }
 
     private function initials(string $name): string

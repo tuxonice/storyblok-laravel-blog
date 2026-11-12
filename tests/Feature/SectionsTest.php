@@ -156,16 +156,19 @@ class SectionsTest extends TestCase
             $locs[(string) $url->loc] = isset($url->lastmod) ? (string) $url->lastmod : null;
         }
 
-        foreach (['/', '/categories', '/about', '/categories/laravel', '/posts/typed-content-from-storyblok', '/posts/sitemaps-from-the-links-endpoint'] as $path) {
+        foreach (['/', '/categories', '/about', '/categories/laravel', '/authors/sample-author', '/posts/typed-content-from-storyblok', '/posts/sitemaps-from-the-links-endpoint'] as $path) {
             $this->assertArrayHasKey($path === '/' ? url('/') : url($path), $locs, "missing {$path}");
         }
 
         // Stories without a route are not listed.
         foreach ($locs as $loc => $_) {
             $this->assertStringNotContainsString('/settings', $loc);
-            $this->assertStringNotContainsString('/authors', $loc);
             $this->assertStringNotContainsString('/home', $loc);
         }
+
+        // The `authors` and `posts` folders have no page of their own. (`/categories` does: it is the index.)
+        $this->assertArrayNotHasKey(url('/authors'), $locs);
+        $this->assertArrayNotHasKey(url('/posts'), $locs);
 
         // Posts carry a last-modified date, other pages do not.
         $this->assertNotNull($locs[url('/posts/typed-content-from-storyblok')]);
