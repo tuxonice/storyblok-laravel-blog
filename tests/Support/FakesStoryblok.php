@@ -21,15 +21,20 @@ trait FakesStoryblok
         return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
     }
 
-    /** @param array<string, array<string, mixed>> $contentOverrides full_slug => fields merged into that story's content */
-    protected function fakeStoryblok(array $contentOverrides = []): void
+    /**
+     * @param  array<string, array<string, mixed>>  $contentOverrides  full_slug => fields merged into that story's content
+     * @param  array<string, array<string, string>|null>  $datasources  datasource slug => [value => name], replacing it (null removes it)
+     */
+    protected function fakeStoryblok(array $contentOverrides = [], array $datasources = []): FakeContentClient
     {
-        $client = new FakeContentClient($contentOverrides);
+        $client = new FakeContentClient($contentOverrides, $datasources);
 
         // Scoped, like the real binding: rebuilt for every request, backed by the same in-memory client.
         $this->app->scoped(StoryblokContent::class, fn () => StoryblokContent::usingClient($client, config('storyblok.namespace')));
         $this->app->forgetInstance(StoryblokContent::class);
         $this->app->forgetInstance(Blog::class);
+
+        return $client;
     }
 
     /** Storyblok is down: every read fails. */

@@ -60,7 +60,7 @@ class PagesTest extends TestCase
             ->assertOk()
             ->assertSee('Sample Author')                         // author relation
             ->assertSee('Backend developer who writes about')    // author bio
-            ->assertSee('#php #storyblok', false)                // tags
+            ->assertSee('<span class="tag">#PHP</span> <span class="tag">#Storyblok</span>', false) // tags, by their datasource names
             ->assertSee('// on this page', false)
             ->assertSee('id="start-with-the-content-model"', false)
             ->assertSee('// note', false)                        // embedded callout

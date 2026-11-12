@@ -4,27 +4,27 @@
     "slug": "tags",
     "entries": [
       {
-        "name": "php",
+        "name": "PHP",
         "value": "php"
       },
       {
-        "name": "laravel",
+        "name": "Laravel",
         "value": "laravel"
       },
       {
-        "name": "storyblok",
+        "name": "Storyblok",
         "value": "storyblok"
       },
       {
-        "name": "blade",
+        "name": "Blade",
         "value": "blade"
       },
       {
-        "name": "cache",
+        "name": "Cache",
         "value": "cache"
       },
       {
-        "name": "seo",
+        "name": "SEO",
         "value": "seo"
       }
     ]

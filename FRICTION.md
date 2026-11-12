@@ -180,10 +180,25 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** typed helpers on `StoryQuery` that pick the operator, such as `whereReference('author', $uuid)` and
   `whereAnyReference('categories', $uuid)`, instead of a raw `array<string, array<string, string>>`.
 
+## 21. Datasource entries: a name lookup has to be built by hand, and a missing datasource throws
+
+- **Tried:** show tag names (from the `tags` datasource) instead of the values a post stores.
+- **Happened:** `datasources()->entries('tags')` works well and walks every page, but it returns a flat list, so every
+  consumer builds the same `value => name` map (`Blog::tagNames()`), and asking for a datasource that does not exist
+  throws `ResourceNotFoundException` where the other reads return `null` or an empty list. A tag with no entry has to be
+  handled too.
+- **Did instead:** one lookup per request, falling back to the value for a tag with no entry, for a missing datasource
+  and for a failed read, because a label is not worth a 500.
+- **Suggestion:** `datasources()->map('tags'): array<string, string>` (value to name, empty when the datasource is
+  missing), or at least a consistent empty result for a missing datasource.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;
   `--path storyblok` therefore needs the space id in the directory name.
+- `storyblok datasources push` matches existing entries by **name**, not value. Renaming an entry (`php` to `PHP`) in
+  the local file therefore creates a second entry with the same value and leaves the old one. Rename entries in the
+  Storyblok UI instead, or delete the old ones first.
 - `storyblok login --token` needs the `users:read` scope; a token scoped only for the Management API is rejected.
 - A wrong-region or no-access login answers 404 ("The requested resource was not found"), not 401/403.
 - `storyblok stories push` is built for copying stories between spaces (pulled manifest, old/new ids), so it does not

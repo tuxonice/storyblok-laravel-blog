@@ -26,9 +26,13 @@ Strike through or delete an item when it is done.
 
 ## 3. Gaps against the goal of testing the package
 
-- **Datasources and languages are unused.** Tags show as raw slugs (`#php`) instead of the names in the `tags`
-  datasource. A tag page or a second language would exercise both.
-- **`FRICTION.md` has 20 entries.** Turn the most useful into issues or a PR on `tuxonice/storyblok-transfers`. Top five:
+- ~~Datasources unused.~~ Tags now show the names from the `tags` datasource (falling back to the value).
+- **Languages are unused.** A second language would exercise the package's language support, and a tag page would use
+  the datasource further.
+- **Rename the tags in Storyblok.** The repo's seed has display names (`PHP`, `SEO`, ...) but your space still has the
+  lowercase ones, so the site looks unchanged. Rename the entries in the Storyblok UI. Do not run
+  `make storyblok-datasources` for this: the CLI matches entries by name, so it would add duplicates.
+- **`FRICTION.md` has 21 entries.** Turn the most useful into issues or a PR on `tuxonice/storyblok-transfers`. Top five:
   1. keep `_editable` and `_uid` on transfers,
   2. merge per-call options onto the defaults,
   3. a `getRelations()` helper,

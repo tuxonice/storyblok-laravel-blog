@@ -44,7 +44,7 @@ class SeoTest extends TestCase
         $this->assertSame(url('/'.self::POST), $meta['og:url']);
         $this->assertSame('2026-11-09T08:00:00+00:00', $meta['article:published_time']);
         $this->assertSame('Sample Author', $meta['article:author']);
-        $this->assertStringContainsString('<meta property="article:tag" content="php">', $html);
+        $this->assertStringContainsString('<meta property="article:tag" content="PHP">', $html);
         $this->assertSame('summary', $meta['twitter:card'], 'No image anywhere, so no large card.');
         $this->assertArrayNotHasKey('og:image', $meta);
     }
@@ -125,7 +125,7 @@ class SeoTest extends TestCase
         $this->assertSame('2026-11-09T08:00:00+00:00', $data['datePublished']);
         $this->assertSame(['@type' => 'Person', 'name' => 'Sample Author'], $data['author']);
         $this->assertSame(url('/'.self::POST), $data['mainEntityOfPage']['@id']);
-        $this->assertSame('php, storyblok', $data['keywords']);
+        $this->assertSame('PHP, Storyblok', $data['keywords']);
         $this->assertArrayNotHasKey('image', $data, 'No image, so the key is left out rather than null.');
     }
 

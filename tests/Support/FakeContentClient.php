@@ -11,7 +11,7 @@ use Tlab\StoryblokTransfers\Client\ResourceNotFoundException;
  * so route tests read the same content as the real space without the network.
  * Supports what the app uses: story by slug or uuid, listings (starts_with,
  * sort_by, page, per_page, filter_query in/any_in_array), resolve_relations and
- * the links tree.
+ * the links tree and datasource entries (read from the datasources.json file in storyblok/datasources).
  */
 class FakeContentClient implements ContentClient
 {
@@ -21,12 +21,27 @@ class FakeContentClient implements ContentClient
     /** @var array<int, array{path: string, query: array<string, string>}> every request received, for assertions */
     public array $requests = [];
 
+    /** @var array<string, array<string, string>> datasource slug => [value => name] */
+    private array $datasources = [];
+
     /** @var array<string, array<string, mixed>> folders keyed by full_slug, for the links tree */
     private array $folders = [];
 
-    /** @param array<string, array<string, mixed>> $contentOverrides full_slug => fields merged into content */
-    public function __construct(array $contentOverrides = [])
+    /**
+     * @param  array<string, array<string, mixed>>  $contentOverrides  full_slug => fields merged into content
+     * @param  array<string, array<string, string>|null>  $datasources  datasource slug => [value => name], replacing it (null removes it)
+     */
+    public function __construct(array $contentOverrides = [], array $datasources = [])
     {
+        foreach (glob(base_path('storyblok/datasources/*/datasources.json')) ?: [] as $file) {
+            foreach (json_decode((string) file_get_contents($file), true, flags: JSON_THROW_ON_ERROR) as $datasource) {
+                $this->datasources[$datasource['slug']] = array_column($datasource['entries'] ?? [], 'name', 'value');
+            }
+        }
+
+        // An override replaces that datasource; null removes it, so the endpoint answers 404 like the real one.
+        $this->datasources = array_filter($datasources + $this->datasources, fn ($entries) => $entries !== null);
+
         $seed = json_decode((string) file_get_contents(base_path('storyblok/stories/stories.json')), true, flags: JSON_THROW_ON_ERROR);
 
         $uuids = [];
@@ -75,6 +90,10 @@ class FakeContentClient implements ContentClient
             return $this->links($query);
         }
 
+        if ($path === 'cdn/datasource_entries') {
+            return $this->datasourceEntries($query);
+        }
+
         $key = rawurldecode(substr($path, strlen('cdn/stories/')));
 
         $story = ($query['find_by'] ?? null) === 'uuid'
@@ -110,6 +129,24 @@ class FakeContentClient implements ContentClient
         $slice = array_slice($stories, ($page - 1) * $perPage, $perPage);
 
         return new ContentResponse(['stories' => $slice, 'rels' => $this->rels($slice, $query)], count($stories), $perPage);
+    }
+
+    /** @param array<string, string> $query */
+    private function datasourceEntries(array $query): ContentResponse
+    {
+        $slug = $query['datasource'] ?? '';
+
+        // Like the real API: asking for a datasource that does not exist is a 404.
+        if (! isset($this->datasources[$slug])) {
+            throw new ResourceNotFoundException("No datasource {$slug}");
+        }
+
+        $entries = [];
+        foreach ($this->datasources[$slug] as $value => $name) {
+            $entries[] = ['id' => count($entries) + 1, 'name' => $name, 'value' => (string) $value, 'dimension_value' => null];
+        }
+
+        return new ContentResponse(['datasource_entries' => $entries], count($entries), (int) ($query['per_page'] ?? 25));
     }
 
     /** @param array<string, string> $query */

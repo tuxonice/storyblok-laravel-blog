@@ -1,2 +1,2 @@
 @props(['tags' => []])
-{{ collect($tags)->map(fn ($t) => '#'.$t)->implode(' ') }}
+{!! collect($tags)->map(fn ($tag) => '<span class="tag">#'.e($tag).'</span>')->implode(' ') !!}

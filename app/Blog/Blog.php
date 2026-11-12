@@ -9,6 +9,8 @@ use App\Storyblok\Transfers\PageTransfer;
 use App\Storyblok\Transfers\PostTransfer;
 use App\Storyblok\Transfers\SiteSettingsTransfer;
 use Carbon\CarbonImmutable;
+use Tlab\StoryblokTransfers\Client\ResourceNotFoundException;
+use Tlab\StoryblokTransfers\Client\StoryblokApiException;
 use Tlab\StoryblokTransfers\Content\ContentOptions;
 use Tlab\StoryblokTransfers\Content\StoryblokContent;
 use Tlab\StoryblokTransfers\Content\StoryQuery;
@@ -25,6 +27,9 @@ class Blog
     private ?BlogIndexTransfer $index = null;
 
     private bool $indexLoaded = false;
+
+    /** @var array<string, string>|null tag value => display name, from the `tags` datasource */
+    private ?array $tagNames = null;
 
     public function __construct(
         private readonly StoryblokContent $storyblok,
@@ -305,6 +310,34 @@ class Blog
         ], $list->getStories());
     }
 
+    /**
+     * Display names for the post tags, from the `tags` datasource. Read once per request (the package
+     * caches it with everything else). A tag with no entry, a missing datasource or a failed read all
+     * fall back to showing the value itself: a label is not worth failing a page for.
+     *
+     * @return array<string, string>
+     */
+    private function tagNames(): array
+    {
+        if ($this->tagNames !== null) {
+            return $this->tagNames;
+        }
+
+        $names = [];
+
+        try {
+            foreach ($this->storyblok->datasources()->entries('tags', null, $this->options()) as $entry) {
+                $names[$entry->getValue()] = $entry->getName() !== '' ? $entry->getName() : $entry->getValue();
+            }
+        } catch (ResourceNotFoundException) {
+            // No `tags` datasource in this space: show the values.
+        } catch (StoryblokApiException $e) {
+            report($e);
+        }
+
+        return $this->tagNames = $names;
+    }
+
     private function index(): ?BlogIndexTransfer
     {
         if (! $this->indexLoaded) {
@@ -353,7 +386,8 @@ class Blog
             'excerpt' => (string) $post->getExcerpt(),
             'date' => CarbonImmutable::parse($post->getPublishedAt() ?? $story->getFirstPublishedAt() ?? 'now'),
             'minutes' => $body->readingMinutes(),
-            'tags' => $post->getTags(),
+            // The post stores tag values (slugs); the datasource has the names editors want shown.
+            'tags' => array_map(fn (string $tag) => $this->tagNames()[$tag] ?? $tag, $post->getTags()),
             'categories' => $categories,
             'cover' => $post->getCoverImage()?->getFilename() ?: null,
             'author' => $this->authorView($authorContent, $author instanceof StoryTransfer ? $author->getSlug() : null, $author instanceof StoryTransfer ? $author->getName() : null),

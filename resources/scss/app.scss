@@ -172,6 +172,10 @@ pre,
     margin: 0 0 1rem;
 }
 
+.tag {
+    white-space: nowrap; // a name such as "Domain driven design" must not break across lines
+}
+
 .meta-mono {
     font-family: $font-family-monospace;
     font-size: 0.8125rem;
