@@ -56,11 +56,9 @@ Strike through or delete an item when it is done.
 - **Confirm the first CI run.** The workflows have not run on GitHub yet. The same steps passed in a clean clone on
   PHP 8.4 and 8.5, and the YAML parses and pins every action to a commit SHA, but `actionlint` was not run. Check the
   first pull request's Actions tab, and make `Code style` and `Tests` required checks in the branch protection rules.
-- **LICENSE file is missing.** `composer.json` says MIT and the README repeats it, but there is no `LICENSE` file. Add
-  one with the copyright holder's name (an owner decision).
-- **PHP version.** `composer.json` says `^8.3`, but `composer.lock` pins Symfony 8, which needs PHP 8.4.1 or newer, so
-  `composer install` fails on 8.3. Either raise the requirement to `^8.4` or regenerate the lock with
-  `config.platform.php` set to 8.3. CI and the README assume 8.4+.
+- ~~LICENSE file.~~ Added (MIT, Helder Correia, 2026).
+- ~~PHP version.~~ `composer.json` now requires `^8.4`, matching the lock file (Symfony 8 needs 8.4.1 or newer), CI
+  and the README.
 - **Security headers.** There is no CSP or similar beyond the draft-mode `frame-ancestors`.
 - **Deployment.** The README lists production steps (`php artisan optimize`, asset build), but no deploy pipeline or
   server configuration exists.

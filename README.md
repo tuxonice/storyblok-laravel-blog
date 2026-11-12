@@ -155,5 +155,5 @@ for package problems, and "ask before adding dependencies".
 
 ## License
 
-The project is MIT licensed (see `composer.json`). Fonts are under the SIL Open Font License; the license texts are in
-`resources/fonts/`. Bootstrap, Laravel, Vite, Sass, Phiki and `tuxonice/storyblok-transfers` are MIT licensed.
+The project is released under the [MIT License](LICENSE). Fonts are under the SIL Open Font License; the license texts
+are in `resources/fonts/`. Bootstrap, Laravel, Vite, Sass, Phiki and `tuxonice/storyblok-transfers` are MIT licensed.
