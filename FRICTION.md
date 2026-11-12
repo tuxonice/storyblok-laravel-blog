@@ -139,6 +139,36 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** `WebhookVerifier::isValid(string $rawBody, ?string $signature, string $secret): bool`, so everyone
   gets the constant-time comparison right.
 
+## 17. `_editable` and `_uid` are dropped, so no click-to-edit in the Visual Editor
+
+- **Tried:** wire the Storyblok Visual Editor with click-to-edit outlines.
+- **Happened:** a draft read from the real API carries `_editable` (the `<!--#storyblok#{...}-->` comment the bridge
+  uses to outline a block) and `_uid` on every component. Neither survives hydration: the generated classes have no
+  field for them and the package never mentions them. The bridge therefore only gets live reload, not outlines.
+- **Did instead:** the bridge reloads the page on `change` and `published`. Editors see saved changes, but cannot click
+  a block in the preview to jump to its field.
+- **Suggestion:** keep `_uid` and `_editable` on every transfer (`getUid()`, `getEditable()`), so a template can print
+  the comment before a block. For the story itself the envelope would need the numeric story id too.
+
+## 18. Choosing draft means choosing a token, and the package leaves both to you
+
+- **Tried:** switch a request to draft content.
+- **Happened:** `Version::Draft` only sets `version=draft`; it needs the preview token, which the client is built with,
+  so the app has to build a different `StoryblokContent` per mode (`AppServiceProvider` picks the token from
+  `DraftMode::active()`). Every per-call `ContentOptions` also has to repeat the version (see entry 5), so
+  `DraftMode::version()` exists just to hand the right one to each call.
+- **Suggestion:** `StoryblokContent::forDrafts(string $previewToken): self` returning a sibling instance, and merge
+  per-call options onto the defaults.
+
+## 19. The HTTP client seam is Guzzle, not PSR-18
+
+- **Tried:** run the real client and cache in tests with the network faked.
+- **Happened:** `create(httpClient:)` takes `GuzzleHttp\ClientInterface` and calls its `request()` method, whereas the
+  cache argument is a PSR-16 interface. A fake therefore has to be a real Guzzle client with a custom handler
+  (`tests/Support/FakeGuzzle.php`), and the app has to depend on Guzzle directly.
+- **Suggestion:** accept `Psr\Http\Client\ClientInterface` (PSR-18) plus a PSR-17 request factory, which also removes
+  the hard Guzzle dependency.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

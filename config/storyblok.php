@@ -31,6 +31,10 @@ return [
     // Seconds beyond that a copy is kept to be served if Storyblok fails.
     'cache_keep_stale_for' => (int) env('STORYBLOK_CACHE_KEEP_STALE_FOR', 86400),
 
+    // Origins allowed to frame draft pages: the Storyblok Visual Editor (EU).
+    // Comma separated; add your region's editor origin if it differs.
+    'editor_origins' => env('STORYBLOK_EDITOR_ORIGINS', 'https://app.storyblok.com'),
+
     // Secret set on the Storyblok webhook (Settings -> Webhooks). Storyblok signs
     // each request with it; the endpoint refuses everything while it is empty.
     'webhook_secret' => env('STORYBLOK_WEBHOOK_SECRET'),

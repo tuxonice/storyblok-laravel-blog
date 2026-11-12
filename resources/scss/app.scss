@@ -201,6 +201,35 @@ pre,
 }
 
 // ---------------------------------------------------------------------------
+// Draft preview bar
+// ---------------------------------------------------------------------------
+.draft-bar {
+    background: var(--tb-surface);
+    border-bottom: 1px solid var(--tb-border);
+    font-family: $font-family-monospace;
+    font-size: 0.8125rem;
+    color: var(--tb-accent);
+
+    .container-xl {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0 1rem;
+    }
+
+    a,
+    span {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    a {
+        color: var(--tb-muted);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Header and footer
 // ---------------------------------------------------------------------------
 .site-header {

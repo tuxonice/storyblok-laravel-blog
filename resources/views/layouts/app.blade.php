@@ -11,6 +11,15 @@
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
+    @if ($draftMode ?? false)
+        <div class="draft-bar" role="status">
+            <div class="container-xl">
+                <span>// draft preview: showing unpublished content</span>
+                <a href="{{ route('preview.exit') }}">exit</a>
+            </div>
+        </div>
+    @endif
+
     <header class="site-header">
         <div class="container-xl d-flex flex-wrap align-items-center justify-content-between gap-2 py-2">
             <a class="wordmark" href="{{ route('home') }}">{{ $site['name'] }}<span>_</span></a>
@@ -43,5 +52,18 @@
             </nav>
         </div>
     </footer>
+    @if ($draftMode ?? false)
+        {{-- Inside the Visual Editor's iframe only: reload on save/publish so the editor sees the change. --}}
+        <script>
+            if (window.self !== window.top) {
+                var bridge = document.createElement('script');
+                bridge.src = 'https://app.storyblok.com/f/storyblok-v2-latest.js';
+                bridge.onload = function () {
+                    new window.StoryblokBridge().on(['change', 'published'], function () { window.location.reload(); });
+                };
+                document.head.appendChild(bridge);
+            }
+        </script>
+    @endif
 </body>
 </html>

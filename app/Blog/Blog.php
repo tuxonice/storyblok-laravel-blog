@@ -13,7 +13,6 @@ use Tlab\StoryblokTransfers\Content\ContentOptions;
 use Tlab\StoryblokTransfers\Content\StoryblokContent;
 use Tlab\StoryblokTransfers\Content\StoryQuery;
 use Tlab\StoryblokTransfers\Content\StoryTransfer;
-use Tlab\StoryblokTransfers\Content\Version;
 use Tlab\StoryblokTransfers\Transfers\LinkTransfer;
 
 /**
@@ -30,6 +29,7 @@ class Blog
     public function __construct(
         private readonly StoryblokContent $storyblok,
         private readonly RichtextRenderer $richtext,
+        private readonly DraftMode $draft,
     ) {}
 
     /** @return array{name: string, nav: array, footer: array} */
@@ -250,7 +250,7 @@ class Blog
      */
     private function options(): ContentOptions
     {
-        return new ContentOptions(Version::from(config('storyblok.version')));
+        return new ContentOptions($this->draft->version());
     }
 
     /** @return array<string, mixed> */

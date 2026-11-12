@@ -18,6 +18,9 @@ class FakeContentClient implements ContentClient
     /** @var array<string, array<string, mixed>> keyed by full_slug */
     private array $stories = [];
 
+    /** @var array<int, array{path: string, query: array<string, string>}> every request received, for assertions */
+    public array $requests = [];
+
     /** @var array<string, array<string, mixed>> folders keyed by full_slug, for the links tree */
     private array $folders = [];
 
@@ -62,6 +65,8 @@ class FakeContentClient implements ContentClient
 
     public function get(string $path, array $query): ContentResponse
     {
+        $this->requests[] = ['path' => $path, 'query' => $query];
+
         if ($path === 'cdn/stories') {
             return $this->listing($query);
         }

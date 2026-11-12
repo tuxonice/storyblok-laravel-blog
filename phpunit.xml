@@ -25,6 +25,7 @@
         <env name="CACHE_STORE" value="array"/>
         <env name="STORYBLOK_SPACE_ID" value="340703"/>
         <env name="STORYBLOK_DELIVERY_TOKEN" value="test-delivery-token"/>
+        <env name="STORYBLOK_PREVIEW_TOKEN" value="test-preview-token"/>
         <env name="STORYBLOK_WEBHOOK_SECRET" value="test-webhook-secret"/>
         <env name="DB_DATABASE" value="testing"/>
         <env name="DB_URL" value=""/>
