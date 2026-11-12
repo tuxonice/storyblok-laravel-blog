@@ -108,8 +108,8 @@ class RichtextRenderingTest extends TestCase
     {
         $post = $this->render([$this->blok(['component' => 'code_block', 'filename' => 'a.php', 'language' => 'php', 'code' => "\$name = 'x';\n    echo new Foo;"])]);
 
-        $this->assertStringContainsString('color:#7cc4ff', $post['body']); // variable
-        $this->assertStringContainsString('color:#9be3a6', $post['body']); // string
+        $this->assertStringContainsString('--d:#7cc4ff;--l:#0b63b5', $post['body']); // variable
+        $this->assertStringContainsString('--d:#9be3a6;--l:#1a7a35', $post['body']); // string
         $this->assertStringContainsString("\n    ", strip_tags($post['body'])); // indentation survives
     }
 

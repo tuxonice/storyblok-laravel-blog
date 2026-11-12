@@ -7,12 +7,18 @@ use Phiki\Grammar\Grammar;
 use Phiki\Phiki;
 
 /**
- * Server-side syntax highlighting with the design's code colors
- * (resources/phiki/blog-dark.json). Returns the inner HTML for a <code> element.
+ * Server-side syntax highlighting with the design's code colors, for both themes
+ * (resources/phiki/blog-dark.json and blog-light.json). Every colored token carries
+ * both colors as CSS variables (--d, --l) and the page's theme picks one, so a
+ * visitor can switch theme without the code being re-rendered.
+ * Returns the inner HTML for a <code> element.
  */
 class CodeHighlighter
 {
-    private const THEME = 'blog-dark';
+    private const THEMES = ['dark' => 'blog-dark', 'light' => 'blog-light'];
+
+    /** Bump when the output format or the themes change, so cached HTML is not served stale. */
+    private const CACHE_VERSION = 'v2';
 
     private const ALIASES = [
         'js' => 'javascript', 'ts' => 'typescript', 'sh' => 'shellscript', 'bash' => 'shellscript',
@@ -27,7 +33,7 @@ class CodeHighlighter
         $grammar = $this->grammar($language);
 
         return Cache::remember(
-            'highlight:'.md5($grammar->value."\0".$code),
+            'highlight:'.self::CACHE_VERSION.':'.md5($grammar->value."\0".$code),
             now()->addDay(),
             fn () => $this->render($code, $grammar),
         );
@@ -36,7 +42,7 @@ class CodeHighlighter
     private function render(string $code, Grammar $grammar): string
     {
         $code = rtrim(str_replace("\r\n", "\n", $code), "\n");
-        $lines = $this->phiki()->codeToHighlightedTokens($code, $grammar, self::THEME);
+        $lines = $this->phiki()->codeToHighlightedTokens($code, $grammar, self::THEMES);
 
         return implode("\n", array_map(function (array $line): string {
             $html = '';
@@ -47,9 +53,12 @@ class CodeHighlighter
                     continue;
                 }
 
-                $key = array_key_first($token->settings);
-                $color = $key === null ? null : $token->settings[$key]->foreground;
-                $html .= $color ? '<span style="color:'.e($color).'">'.e($text).'</span>' : e($text);
+                $dark = $token->settings['dark']->foreground ?? null;
+                $light = $token->settings['light']->foreground ?? null;
+
+                $html .= $dark || $light
+                    ? '<span class="hl" style="--d:'.e($dark ?? 'inherit').';--l:'.e($light ?? 'inherit').'">'.e($text).'</span>'
+                    : e($text);
             }
 
             return $html;
@@ -65,6 +74,8 @@ class CodeHighlighter
 
     private function phiki(): Phiki
     {
-        return $this->phiki ??= (new Phiki)->theme(self::THEME, resource_path('phiki/blog-dark.json'));
+        return $this->phiki ??= (new Phiki)
+            ->theme('blog-dark', resource_path('phiki/blog-dark.json'))
+            ->theme('blog-light', resource_path('phiki/blog-light.json'));
     }
 }

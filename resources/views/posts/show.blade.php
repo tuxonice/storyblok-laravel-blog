@@ -16,7 +16,7 @@
         <span><x-tags :tags="$post['tags']" /></span>
     </div>
     @if ($post['cover'])
-        <img class="img-fluid rounded mb-5 w-100" style="height: 400px; object-fit: cover" src="{{ $post['cover'] }}" alt="">
+        <img class="cover-image mb-5" src="{{ $post['cover'] }}" alt="">
     @else
         <div class="cover-placeholder mb-5" role="img" aria-label="Cover image placeholder">cover image</div>
     @endif

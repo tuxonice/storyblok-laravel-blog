@@ -32,21 +32,42 @@ $text-body: #cfd6df;
 $muted: #9aa4b2;
 $disabled: #8791a0;
 $accent: #f5a524;
+$ink: #0e1116; // text on the amber button, in both themes
 $code-var: #7cc4ff;
 $code-class: #ffcf70;
 $code-string: #9be3a6;
 
-// Bootstrap overrides. Dark is the default theme, so the *-dark variants matter.
+// Light palette (approved): same structure as the dark one. Amber is too pale for text
+// on white (2.0:1), so text accents use a darker amber; the button keeps the bright one.
+$light-page: #ffffff;
+$light-code-bg: #f4f6f9;
+$light-surface: #f6f8fa;
+$light-border: #dfe3e9;
+$light-border-strong: #cdd3dc;
+$light-dashed: #c3cad4;
+$light-text: #0e1116;
+$light-text-body: #2b333d;
+$light-muted: #566170;
+$light-disabled: #677282;
+$light-accent: #8f5700;
+$light-code-var: #0b63b5;
+$light-code-class: #8a5300;
+$light-code-string: #1a7a35;
+
+// Bootstrap overrides. The bare variables are the light theme, the *-dark ones the dark theme.
 $primary: $accent;
-$body-bg: $page-bg;
-$body-color: $text;
+$body-bg: $light-page;
+$body-color: $light-text;
+$body-secondary-color: $light-muted;
+$body-tertiary-bg: $light-surface;
+$border-color: $light-border;
+$link-color: $light-accent;
+$link-hover-color: $light-accent;
 $body-bg-dark: $page-bg;
 $body-color-dark: $text;
 $body-secondary-color-dark: $muted;
 $body-tertiary-bg-dark: $surface;
-$border-color: $border;
 $border-color-dark: $border;
-$link-color: $accent;
 $link-color-dark: $accent;
 $link-hover-color-dark: $accent;
 $link-decoration: none;
@@ -55,7 +76,8 @@ $border-radius-sm: 0.5rem;
 $border-radius-lg: 0.5rem;
 $font-family-sans-serif: 'Inter', system-ui, sans-serif;
 $font-family-monospace: 'JetBrains Mono', ui-monospace, monospace;
-$container-padding-x: 1.5rem;
+// Bootstrap applies half of this as the container's side padding, so 3rem gives the designed 24px.
+$container-padding-x: 3rem;
 $enable-shadows: false;
 $enable-gradients: false;
 
@@ -86,6 +108,25 @@ $enable-gradients: false;
     --tb-muted: #{$muted};
     --tb-disabled: #{$disabled};
     --tb-accent: #{$accent};
+    --tb-code-var: #{$code-var};
+    --tb-code-class: #{$code-class};
+    --tb-code-string: #{$code-string};
+}
+
+[data-bs-theme='light'] {
+    --tb-code-bg: #{$light-code-bg};
+    --tb-surface: #{$light-surface};
+    --tb-border: #{$light-border};
+    --tb-border-strong: #{$light-border-strong};
+    --tb-dashed: #{$light-dashed};
+    --tb-text: #{$light-text};
+    --tb-text-body: #{$light-text-body};
+    --tb-muted: #{$light-muted};
+    --tb-disabled: #{$light-disabled};
+    --tb-accent: #{$light-accent};
+    --tb-code-var: #{$light-code-var};
+    --tb-code-class: #{$light-code-class};
+    --tb-code-string: #{$light-code-string};
 }
 
 // ---------------------------------------------------------------------------
@@ -149,8 +190,8 @@ pre,
         left: 1rem;
         top: 1rem;
         z-index: 10;
-        background: var(--tb-accent);
-        color: $page-bg;
+        background: $accent;
+        color: $ink;
         padding: 0.5rem 1rem;
         border-radius: $border-radius;
     }
@@ -165,13 +206,13 @@ pre,
 // Buttons
 // ---------------------------------------------------------------------------
 .btn-primary {
-    --bs-btn-color: #{$page-bg};
+    --bs-btn-color: #{$ink};
     --bs-btn-bg: #{$accent};
     --bs-btn-border-color: #{$accent};
-    --bs-btn-hover-color: #{$page-bg};
+    --bs-btn-hover-color: #{$ink};
     --bs-btn-hover-bg: #{$accent};
     --bs-btn-hover-border-color: #{$accent};
-    --bs-btn-active-color: #{$page-bg};
+    --bs-btn-active-color: #{$ink};
     --bs-btn-active-bg: #{$accent};
     --bs-btn-active-border-color: #{$accent};
     min-height: 44px;
@@ -196,8 +237,37 @@ pre,
     color: var(--tb-text);
     border: 1px solid var(--tb-border);
     border-radius: $border-radius;
-    cursor: not-allowed;
-    opacity: 0.6;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s;
+
+    &:hover {
+        opacity: 0.75;
+    }
+
+    // Show the icon of the theme you would switch to.
+    .icon-moon {
+        display: none;
+    }
+}
+
+[data-bs-theme='light'] .theme-toggle {
+    .icon-sun {
+        display: none;
+    }
+
+    .icon-moon {
+        display: inline;
+    }
+}
+
+// Highlighted code: every colored token carries both themes' colors.
+.hl {
+    color: var(--d, inherit);
+}
+
+[data-bs-theme='light'] .hl {
+    color: var(--l, inherit);
 }
 
 // ---------------------------------------------------------------------------
@@ -234,6 +304,43 @@ pre,
 // ---------------------------------------------------------------------------
 .site-header {
     border-bottom: 1px solid var(--tb-border);
+
+    // Phone: wordmark and theme toggle on one row, the nav on its own row below.
+    // From md up: wordmark on the left, nav and toggle on the right.
+    .site-header-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 1rem;
+
+        .wordmark {
+            order: 1;
+        }
+
+        .theme-toggle {
+            order: 2;
+            margin-left: auto;
+        }
+
+        .nav-main {
+            order: 3;
+            width: 100%;
+            margin-left: -0.5rem; // the links carry 0.5rem of padding; align their text with the wordmark
+        }
+
+        @include media-breakpoint-up(md) {
+            .nav-main {
+                order: 2;
+                width: auto;
+                margin-left: auto;
+            }
+
+            .theme-toggle {
+                order: 3;
+                margin-left: 0;
+            }
+        }
+    }
 
     .wordmark {
         font-family: $font-family-monospace;
@@ -416,6 +523,12 @@ pre,
         margin-bottom: 0;
     }
 
+    a.mono {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
     .chips {
         display: flex;
         flex-wrap: wrap;
@@ -452,15 +565,15 @@ pre,
     }
 
     .tk-var {
-        color: $code-var;
+        color: var(--tb-code-var);
     }
 
     .tk-class {
-        color: $code-class;
+        color: var(--tb-code-class);
     }
 
     .tk-str {
-        color: $code-string;
+        color: var(--tb-code-string);
     }
 }
 
@@ -493,12 +606,19 @@ pre,
 // Post page
 // ---------------------------------------------------------------------------
 .breadcrumb-mono {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.5ch;
     font-family: $font-family-monospace;
     font-size: 0.875rem;
     color: var(--tb-muted);
 
     a {
         color: var(--tb-muted);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
     }
 }
 
@@ -537,8 +657,17 @@ pre,
     }
 }
 
+.cover-placeholder,
+.cover-image {
+    height: 220px;
+    width: 100%;
+
+    @include media-breakpoint-up(md) {
+        height: 400px;
+    }
+}
+
 .cover-placeholder {
-    height: 400px;
     border: 1px dashed var(--tb-dashed);
     border-radius: $border-radius;
     display: flex;
@@ -547,6 +676,11 @@ pre,
     font-family: $font-family-monospace;
     font-size: 0.875rem;
     color: var(--tb-muted);
+}
+
+.cover-image {
+    object-fit: cover;
+    border-radius: $border-radius;
 }
 
 .article-layout {
@@ -645,7 +779,11 @@ pre,
 }
 
 .toc {
+    // Phone and tablet: the index comes before the article, where it is useful.
+    order: -1;
+
     @include media-breakpoint-up(lg) {
+        order: 0;
         position: sticky;
         top: 1.5rem;
         align-self: start;
