@@ -32,7 +32,7 @@ class Blog
         private readonly DraftMode $draft,
     ) {}
 
-    /** @return array{name: string, nav: array, footer: array} */
+    /** @return array{name: string, ogImage: ?string, nav: array, footer: array} */
     public function site(): array
     {
         return $this->site ??= $this->loadSite();
@@ -123,9 +123,12 @@ class Blog
         /** @var PageTransfer $page */
         $page = $story->getContent();
 
+        $html = $this->richtext->render($page->getBody())->html;
+
         return [
             'title' => (string) ($page->getTitle() ?: $story->getName()),
-            'body' => $this->richtext->render($page->getBody())->html,
+            'body' => $html,
+            'summary' => SeoMeta::describe($html),
         ];
     }
 
@@ -289,6 +292,11 @@ class Blog
             ],
             'body' => $body->html,
             'headings' => $body->headings,
+            'seoTitle' => (string) $post->getSeoTitle(),
+            'seoDescription' => (string) $post->getSeoDescription(),
+            // The dedicated social image, falling back to the cover.
+            'ogImage' => $post->getOgImage()?->getFilename() ?: $post->getCoverImage()?->getFilename() ?: null,
+            'ogImageAlt' => (string) ($post->getOgImage()?->getAlt() ?: $post->getCoverImage()?->getAlt()),
         ];
     }
 
@@ -298,6 +306,7 @@ class Blog
 
         return [
             'name' => (string) ($settings?->getSiteName() ?: config('app.name')),
+            'ogImage' => $settings?->getDefaultOgImage()?->getFilename() ?: null,
             'nav' => $this->links($settings?->getNav() ?? []),
             'footer' => $this->links($settings?->getFooterLinks() ?? []),
         ];

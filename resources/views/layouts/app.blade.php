@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', $site['name'])</title>
+    @include('partials.seo')
     {{-- Apply a saved theme before first paint so there is no flash. Dark is the default. --}}
     <script>try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-bs-theme', t); } catch (e) {}</script>
     <link rel="preload" href="{{ Vite::asset('resources/fonts/inter-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>

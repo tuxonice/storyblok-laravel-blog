@@ -6,6 +6,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoryblokWebhookController;
 use App\Http\Middleware\DetectDraftMode;
@@ -28,6 +29,7 @@ Route::middleware(DetectDraftMode::class)->group(function () {
 
 Route::get('/preview/exit', fn () => redirect()->route('home')->withCookie(app(DraftMode::class)->forgetCookie()))->name('preview.exit');
 
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/feed.xml', FeedController::class)->name('feed');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::post('/webhooks/storyblok', StoryblokWebhookController::class)->middleware('throttle:60,1')->name('webhooks.storyblok');

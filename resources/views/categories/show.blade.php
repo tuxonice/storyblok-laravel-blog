@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', $category['name'].' · '.$site['name'])
-
 @section('content')
 <div class="container-xl pt-4">
     <nav class="breadcrumb-mono mb-3" aria-label="Breadcrumb">

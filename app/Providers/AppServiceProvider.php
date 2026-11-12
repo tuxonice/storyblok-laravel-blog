@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Blog\Blog;
 use App\Blog\DraftMode;
+use App\Blog\SeoMeta;
 use GuzzleHttp\ClientInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -61,7 +62,15 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(
             ['layouts.app', 'home.index', 'posts.show', 'categories.index', 'categories.show', 'pages.about'],
-            fn ($view) => $view->with('site', app(Blog::class)->site())->with('draftMode', app(DraftMode::class)->active()),
+            function ($view) {
+                $site = app(Blog::class)->site();
+                $view->with('site', $site)->with('draftMode', app(DraftMode::class)->active());
+
+                // Pages that do not describe themselves still get a title and a canonical URL.
+                if (! isset($view->getData()['seo'])) {
+                    $view->with('seo', SeoMeta::fallback($site['name'], url()->current(), $site['ogImage']));
+                }
+            },
         );
     }
 }
