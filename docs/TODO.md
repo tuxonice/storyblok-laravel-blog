@@ -50,8 +50,17 @@ Strike through or delete an item when it is done.
 
 ## 5. Project hygiene
 
-- **README** is still the default Laravel one. It needs setup steps: `make setup`, the `.env` keys, the Storyblok CLI
-  login and the webhook.
-- **CI.** There is no `.github/workflows`. A workflow should run lint, tests and the asset build.
+- ~~README.~~ Written: setup, configuration, Storyblok space setup, architecture, development and production notes.
+- ~~CI.~~ `.github/workflows/ci.yml` runs Pint, `composer validate --strict` and the tests on PHP 8.4 and 8.5;
+  `audit.yml` audits dependencies weekly; Dependabot keeps dependencies and the pinned actions current.
+- **Confirm the first CI run.** The workflows have not run on GitHub yet. The same steps passed in a clean clone on
+  PHP 8.4 and 8.5, and the YAML parses and pins every action to a commit SHA, but `actionlint` was not run. Check the
+  first pull request's Actions tab, and make `Code style` and `Tests` required checks in the branch protection rules.
+- **LICENSE file is missing.** `composer.json` says MIT and the README repeats it, but there is no `LICENSE` file. Add
+  one with the copyright holder's name (an owner decision).
+- **PHP version.** `composer.json` says `^8.3`, but `composer.lock` pins Symfony 8, which needs PHP 8.4.1 or newer, so
+  `composer install` fails on 8.3. Either raise the requirement to `^8.4` or regenerate the lock with
+  `config.platform.php` set to 8.3. CI and the README assume 8.4+.
 - **Security headers.** There is no CSP or similar beyond the draft-mode `frame-ancestors`.
-- **Deployment.** No deploy setup exists (`config:cache`, asset build).
+- **Deployment.** The README lists production steps (`php artisan optimize`, asset build), but no deploy pipeline or
+  server configuration exists.

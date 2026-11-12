@@ -6,10 +6,13 @@ export WWWUSER  ?= $(shell id -u)
 export WWWGROUP ?= $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help start stop down restart ps logs shell install setup dev build test test-filter lint lint-fix migrate cache-clear artisan storyblok-login storyblok-pull storyblok-push storyblok-datasources storyblok-stories storyblok-clear-cache storyblok-generate
+.PHONY: help bootstrap start stop down restart ps logs shell install setup dev build test test-filter lint lint-fix migrate cache-clear artisan storyblok-login storyblok-pull storyblok-push storyblok-datasources storyblok-stories storyblok-clear-cache storyblok-generate
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[33m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+bootstrap: ## First clone only: install Composer dependencies (this creates ./vendor/bin/sail)
+	docker run --rm -u "$$(id -u):$$(id -g)" -v "$(CURDIR):/app" -w /app composer:2 install --ignore-platform-reqs --no-scripts --no-interaction
 
 start: ## Start the containers in the background
 	$(SAIL) up -d
