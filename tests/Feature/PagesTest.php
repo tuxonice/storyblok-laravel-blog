@@ -2,21 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Blog\Blog;
-use Tests\Support\FakeContentClient;
+use Tests\Support\FakesStoryblok;
 use Tests\TestCase;
-use Tlab\StoryblokTransfers\Content\StoryblokContent;
 
 class PagesTest extends TestCase
 {
-    private function fakeStoryblok(array $contentOverrides = []): void
-    {
-        $this->app->instance(StoryblokContent::class, StoryblokContent::usingClient(
-            new FakeContentClient($contentOverrides),
-            config('storyblok.namespace'),
-        ));
-        $this->app->forgetInstance(Blog::class);
-    }
+    use FakesStoryblok;
 
     public function test_home_shows_featured_post_latest_posts_and_settings(): void
     {

@@ -30,43 +30,15 @@
         <section aria-labelledby="latest">
             <div class="section-head">
                 <h2 id="latest">Latest posts</h2>
-                <a href="#">all posts</a>
+                <a href="{{ route('home') }}">all posts</a>
             </div>
             @foreach ($posts as $post)
                 <x-post-row :post="$post" />
             @endforeach
-            <nav class="pager" aria-label="Pagination">
-                @if ($hasNewer)
-                    <a href="{{ $page > 2 ? route('home', ['page' => $page - 1]) : route('home') }}">← newer</a>
-                @else
-                    <span class="disabled">← newer</span>
-                @endif
-                @if ($hasOlder)
-                    <a href="{{ route('home', ['page' => $page + 1]) }}">older →</a>
-                @else
-                    <span class="disabled">older →</span>
-                @endif
-            </nav>
+            <x-pager :page="$page" :has-newer="$hasNewer" :has-older="$hasOlder" route="home" />
         </section>
 
-        <aside aria-label="Sidebar">
-            <div class="sidebar-block">
-                <p class="eyebrow">// about</p>
-                <p>{{ $intro }}</p>
-            </div>
-            <div class="sidebar-block">
-                <p class="eyebrow">// categories</p>
-                <div class="chips">
-                    @foreach ($categories as $category)
-                        <a class="chip" href="/categories/{{ $category['slug'] }}">{{ $category['name'] }}</a>
-                    @endforeach
-                </div>
-            </div>
-            <div class="sidebar-block">
-                <p class="eyebrow">// subscribe</p>
-                <a class="mono" href="/feed.xml">rss feed</a>
-            </div>
-        </aside>
+        <x-sidebar :intro="$intro" :categories="$categories" />
     </div>
 </div>
 @endsection

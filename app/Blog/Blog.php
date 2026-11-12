@@ -5,6 +5,7 @@ namespace App\Blog;
 use App\Storyblok\Transfers\AuthorTransfer;
 use App\Storyblok\Transfers\BlogIndexTransfer;
 use App\Storyblok\Transfers\CategoryTransfer;
+use App\Storyblok\Transfers\PageTransfer;
 use App\Storyblok\Transfers\PostTransfer;
 use App\Storyblok\Transfers\SiteSettingsTransfer;
 use Carbon\CarbonImmutable;
@@ -22,6 +23,10 @@ class Blog
 {
     private ?array $site = null;
 
+    private ?BlogIndexTransfer $index = null;
+
+    private bool $indexLoaded = false;
+
     public function __construct(
         private readonly StoryblokContent $storyblok,
         private readonly RichtextRenderer $richtext,
@@ -36,8 +41,8 @@ class Blog
     /** @return array<string, mixed> */
     public function home(int $page): array
     {
-        $index = $this->storyblok->stories()->bySlug('home', BlogIndexTransfer::class, $this->options())?->getContent();
-        $perPage = max(1, (int) ($index?->getPostsPerPage() ?: 10));
+        $index = $this->index();
+        $perPage = $this->postsPerPage();
 
         $list = $this->storyblok->stories()->findBy(new StoryQuery(
             startsWith: 'posts/',
@@ -64,6 +69,120 @@ class Blog
             'hasNewer' => $list->getPage() > 1,
             'hasOlder' => $list->getPage() * $perPage < $list->getTotal(),
         ];
+    }
+
+    /** @return array<string, mixed>|null */
+    public function category(string $slug, int $page): ?array
+    {
+        $story = $this->storyblok->stories()->bySlug('categories/'.$slug, CategoryTransfer::class, $this->options());
+
+        if ($story === null) {
+            return null;
+        }
+
+        $perPage = $this->postsPerPage();
+        $list = $this->storyblok->stories()->findBy(new StoryQuery(
+            startsWith: 'posts/',
+            sortBy: 'content.published_at:desc',
+            filterQuery: ['categories' => ['any_in_array' => $story->getUuid()]],
+            page: max(1, $page),
+            perPage: $perPage,
+            options: $this->options(),
+        ), PostTransfer::class);
+
+        $posts = array_map(fn (StoryTransfer $s) => $this->post($s), $list->getStories());
+
+        // A page past the end is a 404, but an empty first page is a valid empty category.
+        if ($posts === [] && $page > 1) {
+            return null;
+        }
+
+        return [
+            'category' => [
+                'name' => (string) ($story->getContent()->getName() ?: $story->getName()),
+                'slug' => $story->getSlug(),
+                'description' => (string) $story->getContent()->getDescription(),
+            ],
+            'posts' => $posts,
+            'total' => $list->getTotal(),
+            'page' => $list->getPage(),
+            'hasNewer' => $list->getPage() > 1,
+            'hasOlder' => $list->getPage() * $perPage < $list->getTotal(),
+        ];
+    }
+
+    /** @return array{title: string, body: string}|null */
+    public function about(): ?array
+    {
+        $story = $this->storyblok->stories()->bySlug('about', PageTransfer::class, $this->options());
+
+        if ($story === null) {
+            return null;
+        }
+
+        /** @var PageTransfer $page */
+        $page = $story->getContent();
+
+        return [
+            'title' => (string) ($page->getTitle() ?: $story->getName()),
+            'body' => $this->richtext->render($page->getBody())->html,
+        ];
+    }
+
+    /**
+     * The newest posts with their full rendered bodies, for the RSS feed.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function latest(int $limit = 20): array
+    {
+        $list = $this->storyblok->stories()->findBy(new StoryQuery(
+            startsWith: 'posts/',
+            sortBy: 'content.published_at:desc',
+            perPage: min(100, $limit),
+            options: $this->options(),
+        ), PostTransfer::class);
+
+        return array_map(fn (StoryTransfer $s) => $this->post($s), $list->getStories());
+    }
+
+    /**
+     * Every public URL for the sitemap, taken from the links tree (one request),
+     * plus one body-less listing for the posts' last-modified dates, since the
+     * links endpoint carries no dates.
+     *
+     * @return array<int, array{path: string, lastmod: ?string}>
+     */
+    public function sitemap(): array
+    {
+        $lastmod = [];
+        $posts = $this->storyblok->stories()->findBy(new StoryQuery(
+            startsWith: 'posts/',
+            perPage: 100,
+            excludingFields: ['body'],
+            options: $this->options(),
+        ), PostTransfer::class);
+
+        foreach ($posts->getStories() as $story) {
+            $lastmod['/'.$story->getFullSlug()] = $story->getPublishedAt();
+        }
+
+        $entries = [['path' => '/', 'lastmod' => null], ['path' => '/categories', 'lastmod' => null]];
+
+        foreach ($this->storyblok->links()->all(null, $this->options()) as $link) {
+            if ($link->isFolder() || ! $link->isPublished()) {
+                continue;
+            }
+
+            $path = '/'.ltrim($link->getSlug(), '/');
+
+            // Only slugs the app has a route for: posts, categories and the about page.
+            if ($path === '/about' || str_starts_with($path, '/posts/') || str_starts_with($path, '/categories/')) {
+                $entries[] = ['path' => $path, 'lastmod' => $lastmod[$path] ?? null];
+            }
+        }
+
+        return $entries;
     }
 
     /** @return array<string, mixed>|null */
@@ -106,7 +225,23 @@ class Blog
         return array_map(fn (StoryTransfer $s) => [
             'name' => (string) ($s->getContent()->getName() ?: $s->getName()),
             'slug' => $s->getSlug(),
+            'description' => (string) $s->getContent()->getDescription(),
         ], $list->getStories());
+    }
+
+    private function index(): ?BlogIndexTransfer
+    {
+        if (! $this->indexLoaded) {
+            $this->index = $this->storyblok->stories()->bySlug('home', BlogIndexTransfer::class, $this->options())?->getContent();
+            $this->indexLoaded = true;
+        }
+
+        return $this->index;
+    }
+
+    private function postsPerPage(): int
+    {
+        return max(1, (int) ($this->index()?->getPostsPerPage() ?: 10));
     }
 
     /**

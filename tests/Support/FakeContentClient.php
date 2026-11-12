@@ -10,12 +10,16 @@ use Tlab\StoryblokTransfers\Client\ResourceNotFoundException;
  * An in-memory Content Delivery API built from storyblok/stories/stories.json,
  * so route tests read the same content as the real space without the network.
  * Supports what the app uses: story by slug or uuid, listings (starts_with,
- * sort_by, page, per_page) and resolve_relations.
+ * sort_by, page, per_page, filter_query any_in_array), resolve_relations and
+ * the links tree.
  */
 class FakeContentClient implements ContentClient
 {
     /** @var array<string, array<string, mixed>> keyed by full_slug */
     private array $stories = [];
+
+    /** @var array<string, array<string, mixed>> folders keyed by full_slug, for the links tree */
+    private array $folders = [];
 
     /** @param array<string, array<string, mixed>> $contentOverrides full_slug => fields merged into content */
     public function __construct(array $contentOverrides = [])
@@ -29,6 +33,8 @@ class FakeContentClient implements ContentClient
 
         foreach ($seed as $i => $s) {
             if ($s['is_folder'] ?? false) {
+                $this->folders[$s['full_slug']] = ['id' => $i + 1, 'uuid' => $uuids[$s['full_slug']], 'name' => $s['name'], 'slug' => $s['full_slug']];
+
                 continue;
             }
 
@@ -60,6 +66,10 @@ class FakeContentClient implements ContentClient
             return $this->listing($query);
         }
 
+        if ($path === 'cdn/links') {
+            return $this->links($query);
+        }
+
         $key = rawurldecode(substr($path, strlen('cdn/stories/')));
 
         $story = ($query['find_by'] ?? null) === 'uuid'
@@ -78,7 +88,7 @@ class FakeContentClient implements ContentClient
     {
         $stories = array_values(array_filter(
             $this->stories,
-            fn ($s) => str_starts_with($s['full_slug'], $query['starts_with'] ?? ''),
+            fn ($s) => str_starts_with($s['full_slug'], $query['starts_with'] ?? '') && $this->matchesFilters($s, $query),
         ));
 
         if (isset($query['sort_by'])) {
@@ -95,6 +105,47 @@ class FakeContentClient implements ContentClient
         $slice = array_slice($stories, ($page - 1) * $perPage, $perPage);
 
         return new ContentResponse(['stories' => $slice, 'rels' => $this->rels($slice, $query)], count($stories), $perPage);
+    }
+
+    /** @param array<string, string> $query */
+    private function links(array $query): ContentResponse
+    {
+        $prefix = $query['starts_with'] ?? '';
+        $links = [];
+
+        foreach ($this->folders as $slug => $f) {
+            $links[$f['uuid']] = ['id' => $f['id'], 'uuid' => $f['uuid'], 'slug' => $slug, 'name' => $f['name'], 'is_folder' => true, 'parent_id' => 0, 'published' => true, 'position' => 0, 'real_path' => '/'.$slug, 'is_startpage' => false];
+        }
+
+        foreach ($this->stories as $slug => $s) {
+            $links[$s['uuid']] = ['id' => $s['id'], 'uuid' => $s['uuid'], 'slug' => $slug, 'name' => $s['name'], 'is_folder' => false, 'parent_id' => 0, 'published' => true, 'position' => 0, 'real_path' => '/'.$slug, 'is_startpage' => false];
+        }
+
+        return new ContentResponse(['links' => array_filter($links, fn ($l) => str_starts_with($l['slug'], $prefix))]);
+    }
+
+    /** @param array<string, mixed> $story @param array<string, string> $query */
+    private function matchesFilters(array $story, array $query): bool
+    {
+        foreach ($query as $key => $value) {
+            if (! preg_match('/^filter_query\[(.+)\]\[(.+)\]$/', $key, $m)) {
+                continue;
+            }
+
+            [, $field, $operation] = $m;
+            $actual = $story['content'][$field] ?? null;
+
+            $ok = match ($operation) {
+                'any_in_array' => count(array_intersect((array) $actual, explode(',', $value))) > 0,
+                default => throw new \LogicException("FakeContentClient does not support the {$operation} filter."),
+            };
+
+            if (! $ok) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

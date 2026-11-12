@@ -436,6 +436,31 @@ pre,
 }
 
 // ---------------------------------------------------------------------------
+// Section pages (category, about)
+// ---------------------------------------------------------------------------
+.page-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.page-lede {
+    font-size: 1.125rem;
+    color: var(--tb-muted);
+    margin: 0.75rem 0 1rem;
+}
+
+.page-narrow {
+    max-width: 700px;
+}
+
+.chip.active {
+    border-color: var(--tb-accent);
+    color: var(--tb-accent);
+}
+
+// ---------------------------------------------------------------------------
 // Post page
 // ---------------------------------------------------------------------------
 .breadcrumb-mono {

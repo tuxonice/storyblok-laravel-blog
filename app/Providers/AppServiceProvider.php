@@ -34,6 +34,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(Blog::class);
 
-        View::composer(['layouts.app', 'home.index', 'posts.show'], fn ($view) => $view->with('site', app(Blog::class)->site()));
+        View::composer(['layouts.app', 'home.index', 'posts.show', 'categories.index', 'categories.show', 'pages.about'], fn ($view) => $view->with('site', app(Blog::class)->site()));
     }
 }

@@ -91,6 +91,25 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** a small helper on `RichtextTransfer`, such as `getHeadings(int $level = 2): list<array{text: string}>`
   and `getText(): string` (plain text for reading time and excerpts). The renderer could then be a thin layer.
 
+## 12. The links endpoint can return dates, but the package cannot ask for them
+
+- **Tried:** a sitemap with `<lastmod>` from `links()->all()`.
+- **Happened:** Storyblok's links endpoint returns `published_at`, `created_at` and `updated_at` when called with
+  `include_dates=1`. `LinkRepository::all()` only sends what `ContentOptions` produces, so there is no way to pass it,
+  and `LinkEntry` has no date getters.
+- **Did instead:** the sitemap takes URLs from the links tree (one request) and `lastmod` for posts from a second,
+  body-less story listing (`excludingFields: ['body']`). Other pages get no `lastmod`.
+- **Suggestion:** `ContentOptions::withDates()` (or an argument on `links()->all()`) and `LinkEntry::getPublishedAt()`.
+
+## 13. `links()->all()` has no pagination
+
+- **Tried:** read the whole links tree for the sitemap.
+- **Happened:** `all()` makes a single request. The endpoint documents `paginated=1`, `page` and `per_page`, but the
+  package sends none of them, and the docs I could find do not state the size of an unpaginated response, so I cannot
+  say at what site size it starts to truncate. (Unverified; irrelevant for this blog, relevant for a large space.)
+- **Suggestion:** have `all()` walk the pages the way `datasources()->entries()` already does ("every entry is
+  returned; the package fetches all pages for you").
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

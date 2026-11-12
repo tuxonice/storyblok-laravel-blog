@@ -3,12 +3,13 @@
 namespace Tests\Feature;
 
 use App\Blog\Blog;
-use Tests\Support\FakeContentClient;
+use Tests\Support\FakesStoryblok;
 use Tests\TestCase;
-use Tlab\StoryblokTransfers\Content\StoryblokContent;
 
 class RichtextRenderingTest extends TestCase
 {
+    use FakesStoryblok;
+
     private const SLUG = 'posts/typed-content-from-storyblok';
 
     private function t(string $text, array $marks = []): array
@@ -34,11 +35,7 @@ class RichtextRenderingTest extends TestCase
     /** Renders a post whose body is the given nodes, through the real hydration path. */
     private function render(array $nodes): array
     {
-        $this->app->instance(StoryblokContent::class, StoryblokContent::usingClient(
-            new FakeContentClient([self::SLUG => ['body' => ['type' => 'doc', 'content' => $nodes]]]),
-            config('storyblok.namespace'),
-        ));
-        $this->app->forgetInstance(Blog::class);
+        $this->fakeStoryblok([self::SLUG => ['body' => ['type' => 'doc', 'content' => $nodes]]]);
 
         return app(Blog::class)->findPost('typed-content-from-storyblok');
     }

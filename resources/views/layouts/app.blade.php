@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', $site['name'])</title>
     <link rel="preload" href="{{ Vite::asset('resources/fonts/inter-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="alternate" type="application/rss+xml" title="{{ $site['name'] }}" href="{{ route('feed') }}">
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
 <body>
@@ -17,7 +18,7 @@
                 <nav aria-label="Main">
                     <ul class="nav-mono">
                         @foreach ($site['nav'] as $item)
-                            <li><a href="{{ $item['href'] }}" @class(['active' => request()->is(ltrim($item['href'], '/') ?: '/')])>{{ $item['label'] }}</a></li>
+                            <li><a href="{{ $item['href'] }}" @class(['active' => request()->is($p = ltrim($item['href'], '/') ?: '/') || ($p !== '/' && request()->is($p.'/*'))])>{{ $item['label'] }}</a></li>
                         @endforeach
                     </ul>
                 </nav>
