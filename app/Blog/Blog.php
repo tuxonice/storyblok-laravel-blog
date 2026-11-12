@@ -38,6 +38,42 @@ class Blog
         return $this->site ??= $this->loadSite();
     }
 
+    /**
+     * Site settings for an error page. Storyblok may be the very reason the site is failing,
+     * so a failed read falls back to static settings instead of failing the error page too.
+     *
+     * @return array{name: string, ogImage: ?string, nav: array, footer: array}
+     */
+    public function siteOrFallback(): array
+    {
+        try {
+            return $this->site();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return self::fallbackSite();
+        }
+    }
+
+    /** @return array{name: string, ogImage: ?string, nav: array, footer: array} */
+    public static function fallbackSite(): array
+    {
+        return [
+            'name' => (string) config('app.name'),
+            'ogImage' => null,
+            'nav' => [
+                ['label' => 'posts', 'href' => '/'],
+                ['label' => 'categories', 'href' => '/categories'],
+                ['label' => 'about', 'href' => '/about'],
+                ['label' => 'rss', 'href' => '/feed.xml'],
+            ],
+            'footer' => [
+                ['label' => 'rss', 'href' => '/feed.xml'],
+                ['label' => 'sitemap', 'href' => '/sitemap.xml'],
+            ],
+        ];
+    }
+
     /** @return array<string, mixed> */
     public function home(int $page): array
     {

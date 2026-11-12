@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Blog\Blog;
 use App\Blog\DraftMode;
+use App\Blog\ErrorPage;
 use App\Blog\SeoMeta;
 use GuzzleHttp\ClientInterface;
 use Illuminate\Support\Facades\Cache;
@@ -63,7 +64,8 @@ class AppServiceProvider extends ServiceProvider
         View::composer(
             ['layouts.app', 'home.index', 'posts.show', 'categories.index', 'categories.show', 'pages.about'],
             function ($view) {
-                $site = app(Blog::class)->site();
+                // An error page supplies its own (failure-tolerant) site settings.
+                $site = $view->getData()['site'] ?? app(Blog::class)->site();
                 $view->with('site', $site)->with('draftMode', app(DraftMode::class)->active());
 
                 // Pages that do not describe themselves still get a title and a canonical URL.
@@ -72,5 +74,17 @@ class AppServiceProvider extends ServiceProvider
                 }
             },
         );
+
+        // Error pages. They must work when Storyblok is the thing that is broken.
+        View::composer(['errors::404', 'errors::4xx', 'errors::5xx'], function ($view) {
+            $error = ErrorPage::for($view->getData()['exception'] ?? null);
+            $view->with('error', $error);
+
+            // Client errors use the full layout; server errors are a standalone page.
+            if ($error['code'] < 500) {
+                $site = app(Blog::class)->siteOrFallback();
+                $view->with('site', $site)->with('seo', SeoMeta::forError($error['title'], $site['name'], url()->current()));
+            }
+        });
     }
 }

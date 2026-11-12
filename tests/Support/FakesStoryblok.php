@@ -32,6 +32,18 @@ trait FakesStoryblok
         $this->app->forgetInstance(Blog::class);
     }
 
+    /** Storyblok is down: every read fails. */
+    protected function storyblokIsDown(): FailingContentClient
+    {
+        $client = new FailingContentClient;
+
+        $this->app->scoped(StoryblokContent::class, fn () => StoryblokContent::usingClient($client, config('storyblok.namespace')));
+        $this->app->forgetInstance(StoryblokContent::class);
+        $this->app->forgetInstance(Blog::class);
+
+        return $client;
+    }
+
     /**
      * Fakes only the network: the app's real client, cache and token logic run on
      * top of an in-memory Content Delivery API.

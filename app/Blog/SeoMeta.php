@@ -142,6 +142,18 @@ final readonly class SeoMeta
         );
     }
 
+    /** An error page: a title only, never indexed. */
+    public static function forError(string $title, string $siteName, string $url): self
+    {
+        return new self(
+            title: self::title($title, $siteName),
+            description: '',
+            canonical: $url,
+            siteName: $siteName,
+            noindex: true,
+        );
+    }
+
     /** Used by any view that does not supply its own. */
     public static function fallback(string $siteName, string $canonical, ?string $image): self
     {

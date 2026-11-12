@@ -2,7 +2,9 @@
 @if ($seo->description !== '')
     <meta name="description" content="{{ $seo->description }}">
 @endif
-<link rel="canonical" href="{{ $seo->canonical }}">
+@unless ($seo->noindex)
+    <link rel="canonical" href="{{ $seo->canonical }}">
+@endunless
 @if ($seo->noindex || ($draftMode ?? false))
     <meta name="robots" content="noindex, nofollow">
 @endif
@@ -13,7 +15,9 @@
 @if ($seo->description !== '')
     <meta property="og:description" content="{{ $seo->description }}">
 @endif
-<meta property="og:url" content="{{ $seo->canonical }}">
+@unless ($seo->noindex)
+    <meta property="og:url" content="{{ $seo->canonical }}">
+@endunless
 @if ($seo->image)
     <meta property="og:image" content="{{ $seo->image }}">
     <meta property="og:image:alt" content="{{ $seo->imageAlt }}">

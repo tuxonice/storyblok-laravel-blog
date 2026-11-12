@@ -39,8 +39,10 @@ Strike through or delete an item when it is done.
 - ~~SEO fields ignored.~~ Meta description, Open Graph, Twitter cards, canonical URLs and JSON-LD now use
   `seo_title`, `seo_description` and `og_image`.
 - ~~`robots.txt`.~~ Now generated: it points at the sitemap and blocks everything outside production.
-- **Undesigned pages.** 404 and error pages are Laravel's defaults, including the 500 shown when Storyblok is down
-  with an empty cache. There is no author page, no search and no tag pages.
+- ~~404 and error pages.~~ Designed. 404 and other client errors use the site layout (with static fallback settings if
+  Storyblok is down); 500 and 503 are a standalone page with no Storyblok or assets, so they cannot fail for the same
+  reason the site just did.
+- **Still undesigned.** There is no author page, no search and no tag pages.
 - **Author data.** The author card is plain: `avatar`, `website` and `github` are stored but not shown, and it does
   not link anywhere.
 - **Reading time.** Every listing loads each post's full body to compute it (`FRICTION.md` entry 6). Storing it as a
