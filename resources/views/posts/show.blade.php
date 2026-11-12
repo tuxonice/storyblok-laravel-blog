@@ -23,34 +23,13 @@
 
     <div class="article-layout">
         <article class="article">
-            @foreach ($post['body'] as $block)
-                @switch($block['type'])
-                    @case('paragraph')
-                        <p>{{ $block['text'] }}</p>
-                        @break
-                    @case('heading')
-                        <h2 id="{{ $block['id'] }}">{{ $block['text'] }}</h2>
-                        @break
-                    @case('code')
-                        <x-blocks.code_block :filename="$block['filename']" :html="$block['html']" />
-                        @break
-                    @case('callout')
-                        <x-blocks.callout :label="$block['label']" :text="$block['text']" />
-                        @break
-                    @case('quote')
-                        <x-blocks.pull_quote :text="$block['text']" />
-                        @break
-                    @case('figure')
-                        <x-blocks.image_figure :caption="$block['caption']" :src="$block['src'] ?? null" />
-                        @break
-                @endswitch
-            @endforeach
+            {!! $post['body'] !!}
         </article>
 
         <aside class="toc" aria-label="On this page">
             <div class="label">// on this page</div>
             <ol>
-                @foreach ($headings as $h)
+                @foreach ($post['headings'] as $h)
                     <li><a href="#{{ $h['id'] }}">{{ $h['text'] }}</a></li>
                 @endforeach
             </ol>

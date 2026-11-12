@@ -22,7 +22,10 @@ class Blog
 {
     private ?array $site = null;
 
-    public function __construct(private readonly StoryblokContent $storyblok) {}
+    public function __construct(
+        private readonly StoryblokContent $storyblok,
+        private readonly RichtextRenderer $richtext,
+    ) {}
 
     /** @return array{name: string, nav: array, footer: array} */
     public function site(): array
@@ -120,7 +123,7 @@ class Blog
     {
         /** @var PostTransfer $post */
         $post = $story->getContent();
-        $blocks = RichtextBlocks::blocks($post->getBody());
+        $body = $this->richtext->render($post->getBody());
 
         $author = $story->getRelation($post->getAuthor());
         $authorContent = $author instanceof StoryTransfer ? $author->getContent() : null;
@@ -139,7 +142,7 @@ class Blog
             'title' => (string) $post->getTitle(),
             'excerpt' => (string) $post->getExcerpt(),
             'date' => CarbonImmutable::parse($post->getPublishedAt() ?? $story->getFirstPublishedAt() ?? 'now'),
-            'minutes' => RichtextBlocks::readingMinutes($blocks),
+            'minutes' => $body->readingMinutes(),
             'tags' => $post->getTags(),
             'categories' => $categories,
             'cover' => $post->getCoverImage()?->getFilename() ?: null,
@@ -149,7 +152,8 @@ class Blog
                 'role' => (string) ($authorContent?->getRole()),
                 'bio' => (string) ($authorContent?->getBio()),
             ],
-            'body' => $blocks,
+            'body' => $body->html,
+            'headings' => $body->headings,
         ];
     }
 

@@ -13,7 +13,6 @@ class PostController extends Controller
         return view('posts.show', [
             'post' => $post,
             'related' => $blog->related($slug),
-            'headings' => array_values(array_filter($post['body'], fn ($b) => $b['type'] === 'heading')),
         ]);
     }
 }

@@ -73,7 +73,7 @@ class PagesTest extends TestCase
             ->assertSee('// on this page', false)
             ->assertSee('id="start-with-the-content-model"', false)
             ->assertSee('// note', false)                        // embedded callout
-            ->assertSee('$story = $storyblok-&gt;stories()', false) // embedded code block, HTML-escaped
+            ->assertSee('color:#7cc4ff', false)                  // embedded code block, highlighted
             ->assertSee('// keep reading', false);
     }
 

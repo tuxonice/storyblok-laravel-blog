@@ -82,6 +82,15 @@ Format: what I tried, what happened, what I did instead, suggested change.
   (`App\Blog\RichtextBlocks`, temporary until step 5).
 - **Suggestion:** a walk helper that yields `[node, components]` pairs, so renderers do not index by id themselves.
 
+## 11. Heading anchors and the index have to come from your own walk
+
+- **Tried:** build the "on this page" index and heading anchors from the richtext.
+- **Happened:** the package hands over the raw node tree, so collecting headings, slugifying, de-duplicating ids and
+  counting words all live in my own renderer (`App\\Blog\\RichtextRenderer`). I wrote the renderer instead of adding
+  `storyblok/richtext-resolver`, because anchors, the index and the embedded blocks all need hooks into the same walk.
+- **Suggestion:** a small helper on `RichtextTransfer`, such as `getHeadings(int $level = 2): list<array{text: string}>`
+  and `getText(): string` (plain text for reading time and excerpts). The renderer could then be a thin layer.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

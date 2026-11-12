@@ -1,0 +1,63 @@
+{
+    "name": "blog-dark",
+    "type": "dark",
+    "colors": {
+        "editor.background": "#0a0d12",
+        "editor.foreground": "#cfd6df"
+    },
+    "tokenColors": [
+        {
+            "scope": [
+                "variable",
+                "variable.other",
+                "variable.parameter",
+                "punctuation.definition.variable",
+                "support.variable",
+                "keyword.blade",
+                "keyword.control.blade",
+                "support.function.directive",
+                "entity.name.function.directive"
+            ],
+            "settings": {
+                "foreground": "#7cc4ff"
+            }
+        },
+        {
+            "scope": [
+                "entity.name.class",
+                "entity.name.type",
+                "entity.other.inherited-class",
+                "support.class",
+                "support.type",
+                "entity.name.tag",
+                "entity.name.tag.blade",
+                "support.class.component"
+            ],
+            "settings": {
+                "foreground": "#ffcf70"
+            }
+        },
+        {
+            "scope": [
+                "string.quoted",
+                "string.template",
+                "string.interpolated",
+                "string.regexp",
+                "markup.inserted"
+            ],
+            "settings": {
+                "foreground": "#9be3a6"
+            }
+        },
+        {
+            "scope": [
+                "comment",
+                "punctuation.definition.comment"
+            ],
+            "settings": {
+                "foreground": "#9aa4b2",
+                "fontStyle": "italic"
+            }
+        }
+    ]
+}
