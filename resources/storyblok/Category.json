@@ -1,0 +1,19 @@
+{
+    "transfers": [
+        {
+            "name": "Category",
+            "properties": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "description",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

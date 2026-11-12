@@ -1,0 +1,20 @@
+{
+    "transfers": [
+        {
+            "name": "Page",
+            "properties": [
+                {
+                    "name": "title",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "body",
+                    "type": "RichtextTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\RichtextTransfer"
+                }
+            ]
+        }
+    ]
+}

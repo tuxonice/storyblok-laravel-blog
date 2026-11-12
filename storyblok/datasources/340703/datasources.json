@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Tags",
+    "slug": "tags",
+    "entries": [
+      {
+        "name": "php",
+        "value": "php"
+      },
+      {
+        "name": "laravel",
+        "value": "laravel"
+      },
+      {
+        "name": "storyblok",
+        "value": "storyblok"
+      },
+      {
+        "name": "blade",
+        "value": "blade"
+      },
+      {
+        "name": "cache",
+        "value": "cache"
+      },
+      {
+        "name": "seo",
+        "value": "seo"
+      }
+    ]
+  }
+]

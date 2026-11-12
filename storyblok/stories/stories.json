@@ -1,0 +1,671 @@
+[
+  {
+    "full_slug": "authors",
+    "name": "Authors",
+    "is_folder": true,
+    "default_root": "author"
+  },
+  {
+    "full_slug": "categories",
+    "name": "Categories",
+    "is_folder": true,
+    "default_root": "category"
+  },
+  {
+    "full_slug": "posts",
+    "name": "Posts",
+    "is_folder": true,
+    "default_root": "post"
+  },
+  {
+    "full_slug": "authors/sample-author",
+    "name": "Sample Author",
+    "content": {
+      "component": "author",
+      "name": "Sample Author",
+      "role": "Backend developer",
+      "bio": "Backend developer who writes about PHP, content modelling and the small details that make a codebase pleasant.",
+      "github": "https://github.com/tuxonice"
+    }
+  },
+  {
+    "full_slug": "categories/laravel",
+    "name": "Laravel",
+    "content": {
+      "component": "category",
+      "name": "Laravel",
+      "description": "Building the blog with Laravel, Blade and Vite."
+    }
+  },
+  {
+    "full_slug": "categories/storyblok",
+    "name": "Storyblok",
+    "content": {
+      "component": "category",
+      "name": "Storyblok",
+      "description": "Modelling and reading content from the headless CMS."
+    }
+  },
+  {
+    "full_slug": "categories/php",
+    "name": "PHP",
+    "content": {
+      "component": "category",
+      "name": "PHP",
+      "description": "Typed objects, hydration and other language-level details."
+    }
+  },
+  {
+    "full_slug": "categories/tooling",
+    "name": "Tooling",
+    "content": {
+      "component": "category",
+      "name": "Tooling",
+      "description": "CLIs, generators, Makefiles and the glue around them."
+    }
+  },
+  {
+    "full_slug": "posts/typed-content-from-storyblok",
+    "name": "Typed content from a headless CMS",
+    "content": {
+      "component": "post",
+      "title": "Typed content from a headless CMS",
+      "excerpt": "Why generating one PHP class per component beats passing arrays around, and what it costs you.",
+      "published_at": "2026-11-09 08:00",
+      "author": "{{uuid:authors/sample-author}}",
+      "categories": [
+        "{{uuid:categories/storyblok}}",
+        "{{uuid:categories/php}}"
+      ],
+      "tags": [
+        "php",
+        "storyblok"
+      ],
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Most headless CMS integrations start the same way: a decoded JSON array, a few null checks and a template that quietly knows too much about the shape of the data. It works until the content model changes."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Start with the content model"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Components in the CMS are the contract. If each one becomes a class, the contract is visible to your editor, to static analysis and to the next person reading the template."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "code_block",
+                  "filename": "app/Http/Controllers/PostController.php",
+                  "language": "php",
+                  "code": "$story = $storyblok->stories()\n    ->bySlug('posts/'.$slug, PostTransfer::class);\n\n$title = $story?->getContent()->getTitle();"
+                }
+              ]
+            }
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "callout",
+                  "label": "// note",
+                  "text": "Everything except arrays is nullable, so templates need the nullsafe operator or a fallback."
+                }
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Resolve relations once"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Relations arrive next to the content, not inside it. Look them up once per request and pass the result down, instead of asking in every partial."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "pull_quote",
+                  "text": "The template should read like a description of the page, not a negotiation with the API."
+                }
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Keep the glue small"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Every workaround you write is a suggestion for the package. Write it down while it is still annoying."
+              }
+            ]
+          }
+        ]
+      },
+      "seo_title": "Typed content from a headless CMS · your-blog",
+      "seo_description": "Why generating one PHP class per component beats passing arrays around, and what it costs you."
+    }
+  },
+  {
+    "full_slug": "posts/caching-published-reads",
+    "name": "Caching published reads without surprises",
+    "content": {
+      "component": "post",
+      "title": "Caching published reads without surprises",
+      "excerpt": "Fresh windows, stale fallbacks and when a webhook should purge what.",
+      "published_at": "2026-11-02 08:00",
+      "author": "{{uuid:authors/sample-author}}",
+      "categories": [
+        "{{uuid:categories/laravel}}",
+        "{{uuid:categories/tooling}}"
+      ],
+      "tags": [
+        "laravel",
+        "cache"
+      ],
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Published content changes rarely and is read constantly, which makes it a good fit for a short cache. The interesting part is what happens when the refresh fails."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "A store of its own"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Give Storyblok a dedicated cache store. Clearing it from a webhook empties the whole store, so it must not share a store with sessions or anything else."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "code_block",
+                  "filename": "config/cache.php",
+                  "language": "php",
+                  "code": "'storyblok' => [\n    'driver' => 'file',\n    'path' => storage_path('framework/cache/storyblok'),\n],"
+                }
+              ]
+            }
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "callout",
+                  "label": "// heads up",
+                  "text": "Drafts are never cached, so editors see their changes immediately in a preview environment."
+                }
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Stale is better than down"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "A stale copy can be served for up to a day if a refresh fails. For a blog that is the right trade: a slightly old post beats an error page."
+              }
+            ]
+          }
+        ]
+      },
+      "seo_title": "Caching published reads without surprises · your-blog",
+      "seo_description": "Fresh windows, stale fallbacks and when a webhook should purge what."
+    }
+  },
+  {
+    "full_slug": "posts/richtext-with-embedded-blocks",
+    "name": "Rendering richtext with embedded blocks",
+    "content": {
+      "component": "post",
+      "title": "Rendering richtext with embedded blocks",
+      "excerpt": "Walking the richtext tree, rendering nested components and deriving heading anchors.",
+      "published_at": "2026-10-24 08:00",
+      "author": "{{uuid:authors/sample-author}}",
+      "categories": [
+        "{{uuid:categories/storyblok}}",
+        "{{uuid:categories/laravel}}"
+      ],
+      "tags": [
+        "blade",
+        "storyblok"
+      ],
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Storyblok richtext is a tree. Paragraphs, headings and lists are nodes, and editors can insert whole components between them."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Walk the tree yourself"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "A small recursive renderer is enough: plain nodes become HTML, and component nodes dispatch to a Blade component named after the block."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "code_block",
+                  "filename": "resources/views/components/blocks/callout.blade.php",
+                  "language": "blade",
+                  "code": "@props(['label' => '// note', 'text' => ''])\n<aside class=\"callout\">\n    <div class=\"label\">{{ $label }}</div>\n    <p>{{ $text }}</p>\n</aside>"
+                }
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Anchors and the index"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Heading ids and the on-this-page index come from the same walk: collect every level-two heading, slugify its text, and render both."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "pull_quote",
+                  "text": "One pass over the document, three outputs: HTML, anchors and read time."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "seo_title": "Rendering richtext with embedded blocks · your-blog",
+      "seo_description": "Walking the richtext tree, rendering nested components and deriving heading anchors."
+    }
+  },
+  {
+    "full_slug": "posts/blade-components-for-blocks",
+    "name": "One Blade component per block",
+    "content": {
+      "component": "post",
+      "title": "One Blade component per block",
+      "excerpt": "Mapping CMS block names to anonymous components and keeping the mapping honest.",
+      "published_at": "2026-10-12 08:00",
+      "author": "{{uuid:authors/sample-author}}",
+      "categories": [
+        "{{uuid:categories/laravel}}"
+      ],
+      "tags": [
+        "blade"
+      ],
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "A block named code_block in the CMS maps to a Blade component with the same name. No registry, no switch statement, just a naming rule."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The naming rule"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Anonymous components live in resources/views/components/blocks. The renderer builds the component name from the block name and skips anything it does not recognise."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "callout",
+                  "label": "// rule",
+                  "text": "Unknown blocks are skipped, not fatal. An editor adding a new block type should never take the page down."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "seo_title": "One Blade component per block · your-blog",
+      "seo_description": "Mapping CMS block names to anonymous components and keeping the mapping honest."
+    }
+  },
+  {
+    "full_slug": "posts/sitemaps-from-the-links-endpoint",
+    "name": "Sitemaps from the links endpoint",
+    "content": {
+      "component": "post",
+      "title": "Sitemaps from the links endpoint",
+      "excerpt": "A sitemap that costs one request instead of one per story.",
+      "published_at": "2026-10-03 08:00",
+      "author": "{{uuid:authors/sample-author}}",
+      "categories": [
+        "{{uuid:categories/laravel}}",
+        "{{uuid:categories/tooling}}"
+      ],
+      "tags": [
+        "seo",
+        "laravel"
+      ],
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "A sitemap needs a path and a date for every page, not every page's content. The links endpoint returns exactly that."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "One request"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Ask the links endpoint for everything under posts and map each entry to a url element. The result fits comfortably in a short cache."
+              }
+            ]
+          },
+          {
+            "type": "blok",
+            "attrs": {
+              "id": null,
+              "body": [
+                {
+                  "component": "code_block",
+                  "filename": "routes/web.php",
+                  "language": "php",
+                  "code": "Route::get('/sitemap.xml', SitemapController::class);"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "seo_title": "Sitemaps from the links endpoint · your-blog",
+      "seo_description": "A sitemap that costs one request instead of one per story."
+    }
+  },
+  {
+    "full_slug": "home",
+    "name": "Home",
+    "content": {
+      "component": "blog_index",
+      "intro": "Notes on building things with Laravel, a headless CMS and a few honest mistakes along the way.",
+      "featured_post": "{{uuid:posts/typed-content-from-storyblok}}",
+      "posts_per_page": 10
+    }
+  },
+  {
+    "full_slug": "about",
+    "name": "About",
+    "content": {
+      "component": "page",
+      "title": "About",
+      "body": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "This blog is a developer notebook about building with Laravel and Storyblok."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "It is also the first real project built on tuxonice/storyblok-transfers, so some posts are about what worked and what did not."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "full_slug": "settings",
+    "name": "Settings",
+    "content": {
+      "component": "site_settings",
+      "site_name": "your-blog",
+      "nav": [
+        {
+          "component": "nav_link",
+          "label": "posts",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/",
+            "cached_url": "/"
+          }
+        },
+        {
+          "component": "nav_link",
+          "label": "categories",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/categories",
+            "cached_url": "/categories"
+          }
+        },
+        {
+          "component": "nav_link",
+          "label": "about",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/about",
+            "cached_url": "/about"
+          }
+        },
+        {
+          "component": "nav_link",
+          "label": "rss",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/feed.xml",
+            "cached_url": "/feed.xml"
+          }
+        }
+      ],
+      "footer_links": [
+        {
+          "component": "nav_link",
+          "label": "rss",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/feed.xml",
+            "cached_url": "/feed.xml"
+          }
+        },
+        {
+          "component": "nav_link",
+          "label": "sitemap",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "/sitemap.xml",
+            "cached_url": "/sitemap.xml"
+          }
+        },
+        {
+          "component": "nav_link",
+          "label": "github",
+          "link": {
+            "fieldtype": "multilink",
+            "linktype": "url",
+            "url": "https://github.com/tuxonice/storyblok-transfers",
+            "cached_url": "https://github.com/tuxonice/storyblok-transfers"
+          }
+        }
+      ]
+    }
+  }
+]

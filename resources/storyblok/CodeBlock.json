@@ -1,0 +1,24 @@
+{
+    "transfers": [
+        {
+            "name": "CodeBlock",
+            "properties": [
+                {
+                    "name": "filename",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "language",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "code",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

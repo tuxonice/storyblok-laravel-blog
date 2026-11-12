@@ -1,0 +1,14 @@
+{
+    "transfers": [
+        {
+            "name": "PullQuote",
+            "properties": [
+                {
+                    "name": "text",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

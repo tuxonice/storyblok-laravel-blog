@@ -34,6 +34,12 @@ return [
 
     'stores' => [
 
+        // Dedicated store for Storyblok reads: the webhook clears the whole store.
+        'storyblok' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/storyblok'),
+        ],
+
         'array' => [
             'driver' => 'array',
             'serialize' => false,

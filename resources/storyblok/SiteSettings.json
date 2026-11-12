@@ -1,0 +1,32 @@
+{
+    "transfers": [
+        {
+            "name": "SiteSettings",
+            "properties": [
+                {
+                    "name": "siteName",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "nav",
+                    "type": "BlokTransfer[]",
+                    "singular": "navItem",
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\BlokTransfer"
+                },
+                {
+                    "name": "footerLinks",
+                    "type": "BlokTransfer[]",
+                    "singular": "footerLink",
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\BlokTransfer"
+                },
+                {
+                    "name": "defaultOgImage",
+                    "type": "AssetTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\AssetTransfer"
+                }
+            ]
+        }
+    ]
+}

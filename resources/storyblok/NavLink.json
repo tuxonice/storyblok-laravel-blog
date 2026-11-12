@@ -1,0 +1,20 @@
+{
+    "transfers": [
+        {
+            "name": "NavLink",
+            "properties": [
+                {
+                    "name": "label",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "link",
+                    "type": "LinkTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\LinkTransfer"
+                }
+            ]
+        }
+    ]
+}

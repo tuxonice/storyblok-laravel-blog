@@ -1,0 +1,20 @@
+{
+    "transfers": [
+        {
+            "name": "ImageFigure",
+            "properties": [
+                {
+                    "name": "image",
+                    "type": "AssetTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\AssetTransfer"
+                },
+                {
+                    "name": "caption",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

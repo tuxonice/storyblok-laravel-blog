@@ -1,0 +1,41 @@
+{
+    "transfers": [
+        {
+            "name": "Author",
+            "properties": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "role",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "bio",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "avatar",
+                    "type": "AssetTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\AssetTransfer"
+                },
+                {
+                    "name": "website",
+                    "type": "LinkTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\LinkTransfer"
+                },
+                {
+                    "name": "github",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

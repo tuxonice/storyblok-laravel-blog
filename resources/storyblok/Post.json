@@ -1,0 +1,67 @@
+{
+    "transfers": [
+        {
+            "name": "Post",
+            "properties": [
+                {
+                    "name": "title",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "excerpt",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "coverImage",
+                    "type": "AssetTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\AssetTransfer"
+                },
+                {
+                    "name": "publishedAt",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "author",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "categories",
+                    "type": "string[]",
+                    "singular": "category"
+                },
+                {
+                    "name": "tags",
+                    "type": "string[]",
+                    "singular": "tag"
+                },
+                {
+                    "name": "body",
+                    "type": "RichtextTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\RichtextTransfer"
+                },
+                {
+                    "name": "seoTitle",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "seoDescription",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "ogImage",
+                    "type": "AssetTransfer",
+                    "nullable": true,
+                    "namespace": "Tlab\\StoryblokTransfers\\Transfers\\AssetTransfer"
+                }
+            ]
+        }
+    ]
+}

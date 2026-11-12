@@ -1,0 +1,24 @@
+{
+    "transfers": [
+        {
+            "name": "BlogIndex",
+            "properties": [
+                {
+                    "name": "intro",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "featuredPost",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "postsPerPage",
+                    "type": "float",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,333 @@
+[
+  {
+    "name": "post",
+    "display_name": "Post",
+    "schema": {
+      "title": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "excerpt": {
+        "type": "textarea",
+        "pos": 1
+      },
+      "cover_image": {
+        "type": "asset",
+        "filetypes": [
+          "images"
+        ],
+        "pos": 2
+      },
+      "published_at": {
+        "type": "datetime",
+        "pos": 3
+      },
+      "author": {
+        "type": "option",
+        "source": "internal_stories",
+        "filter_content_type": [
+          "author"
+        ],
+        "use_uuid": true,
+        "pos": 4
+      },
+      "categories": {
+        "type": "options",
+        "source": "internal_stories",
+        "filter_content_type": [
+          "category"
+        ],
+        "use_uuid": true,
+        "pos": 5
+      },
+      "tags": {
+        "type": "options",
+        "source": "internal",
+        "datasource_slug": "tags",
+        "pos": 6
+      },
+      "body": {
+        "type": "richtext",
+        "restrict_components": true,
+        "component_whitelist": [
+          "code_block",
+          "callout",
+          "pull_quote",
+          "image_figure"
+        ],
+        "pos": 7
+      },
+      "seo_title": {
+        "type": "text",
+        "pos": 8
+      },
+      "seo_description": {
+        "type": "textarea",
+        "pos": 9
+      },
+      "og_image": {
+        "type": "asset",
+        "filetypes": [
+          "images"
+        ],
+        "pos": 10
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": "title"
+  },
+  {
+    "name": "author",
+    "display_name": "Author",
+    "schema": {
+      "name": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "role": {
+        "type": "text",
+        "pos": 1
+      },
+      "bio": {
+        "type": "textarea",
+        "pos": 2
+      },
+      "avatar": {
+        "type": "asset",
+        "filetypes": [
+          "images"
+        ],
+        "pos": 3
+      },
+      "website": {
+        "type": "multilink",
+        "pos": 4
+      },
+      "github": {
+        "type": "text",
+        "pos": 5
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": "name"
+  },
+  {
+    "name": "category",
+    "display_name": "Category",
+    "schema": {
+      "name": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "description": {
+        "type": "textarea",
+        "pos": 1
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": "name"
+  },
+  {
+    "name": "blog_index",
+    "display_name": "Blog index",
+    "schema": {
+      "intro": {
+        "type": "textarea",
+        "pos": 0
+      },
+      "featured_post": {
+        "type": "option",
+        "source": "internal_stories",
+        "filter_content_type": [
+          "post"
+        ],
+        "use_uuid": true,
+        "pos": 1
+      },
+      "posts_per_page": {
+        "type": "number",
+        "default_value": "10",
+        "pos": 2
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": null
+  },
+  {
+    "name": "page",
+    "display_name": "Page",
+    "schema": {
+      "title": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "body": {
+        "type": "richtext",
+        "pos": 1
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": "title"
+  },
+  {
+    "name": "site_settings",
+    "display_name": "Site settings",
+    "schema": {
+      "site_name": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "nav": {
+        "type": "bloks",
+        "restrict_components": true,
+        "component_whitelist": [
+          "nav_link"
+        ],
+        "pos": 1
+      },
+      "footer_links": {
+        "type": "bloks",
+        "restrict_components": true,
+        "component_whitelist": [
+          "nav_link"
+        ],
+        "pos": 2
+      },
+      "default_og_image": {
+        "type": "asset",
+        "filetypes": [
+          "images"
+        ],
+        "pos": 3
+      }
+    },
+    "is_root": true,
+    "is_nestable": false,
+    "color": null,
+    "icon": null,
+    "preview_field": null
+  },
+  {
+    "name": "nav_link",
+    "display_name": "Nav link",
+    "schema": {
+      "label": {
+        "type": "text",
+        "required": true,
+        "pos": 0
+      },
+      "link": {
+        "type": "multilink",
+        "pos": 1
+      }
+    },
+    "is_root": false,
+    "is_nestable": true,
+    "color": null,
+    "icon": null,
+    "preview_field": "label"
+  },
+  {
+    "name": "code_block",
+    "display_name": "Code block",
+    "schema": {
+      "filename": {
+        "type": "text",
+        "pos": 0
+      },
+      "language": {
+        "type": "text",
+        "pos": 1
+      },
+      "code": {
+        "type": "textarea",
+        "required": true,
+        "pos": 2
+      }
+    },
+    "is_root": false,
+    "is_nestable": true,
+    "color": null,
+    "icon": null,
+    "preview_field": "filename"
+  },
+  {
+    "name": "callout",
+    "display_name": "Callout",
+    "schema": {
+      "label": {
+        "type": "text",
+        "pos": 0
+      },
+      "text": {
+        "type": "textarea",
+        "required": true,
+        "pos": 1
+      }
+    },
+    "is_root": false,
+    "is_nestable": true,
+    "color": null,
+    "icon": null,
+    "preview_field": "label"
+  },
+  {
+    "name": "pull_quote",
+    "display_name": "Pull quote",
+    "schema": {
+      "text": {
+        "type": "textarea",
+        "required": true,
+        "pos": 0
+      }
+    },
+    "is_root": false,
+    "is_nestable": true,
+    "color": null,
+    "icon": null,
+    "preview_field": "text"
+  },
+  {
+    "name": "image_figure",
+    "display_name": "Image figure",
+    "schema": {
+      "image": {
+        "type": "asset",
+        "filetypes": [
+          "images"
+        ],
+        "required": true,
+        "pos": 0
+      },
+      "caption": {
+        "type": "text",
+        "pos": 1
+      }
+    },
+    "is_root": false,
+    "is_nestable": true,
+    "color": null,
+    "icon": null,
+    "preview_field": "caption"
+  }
+]

@@ -1,0 +1,19 @@
+{
+    "transfers": [
+        {
+            "name": "Callout",
+            "properties": [
+                {
+                    "name": "label",
+                    "type": "string",
+                    "nullable": true
+                },
+                {
+                    "name": "text",
+                    "type": "string",
+                    "nullable": true
+                }
+            ]
+        }
+    ]
+}
