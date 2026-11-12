@@ -2,19 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\SampleBlog;
+use App\Blog\Blog;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request, Blog $blog)
     {
-        $posts = SampleBlog::posts();
-
-        return view('home.index', [
-            'site' => SampleBlog::site(),
-            'categories' => SampleBlog::categories(),
-            'featured' => $posts[0],
-            'posts' => $posts,
-        ]);
+        return view('home.index', $blog->home(max(1, $request->integer('page', 1))));
     }
 }

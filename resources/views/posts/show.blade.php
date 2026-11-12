@@ -15,7 +15,11 @@
         <span>{{ $post['minutes'] }} min read</span>
         <span><x-tags :tags="$post['tags']" /></span>
     </div>
-    <div class="cover-placeholder mb-5" role="img" aria-label="Cover image placeholder">cover image</div>
+    @if ($post['cover'])
+        <img class="img-fluid rounded mb-5 w-100" style="height: 400px; object-fit: cover" src="{{ $post['cover'] }}" alt="">
+    @else
+        <div class="cover-placeholder mb-5" role="img" aria-label="Cover image placeholder">cover image</div>
+    @endif
 
     <div class="article-layout">
         <article class="article">
@@ -37,7 +41,7 @@
                         <x-blocks.pull_quote :text="$block['text']" />
                         @break
                     @case('figure')
-                        <x-blocks.image_figure :caption="$block['caption']" />
+                        <x-blocks.image_figure :caption="$block['caption']" :src="$block['src'] ?? null" />
                         @break
                 @endswitch
             @endforeach

@@ -36,9 +36,9 @@
         <div class="container-xl d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
             <span>Built with Storyblok, Laravel and tuxonice/storyblok-transfers</span>
             <nav aria-label="Footer" class="d-flex gap-3">
-                <a href="/feed.xml">rss</a>
-                <a href="/sitemap.xml">sitemap</a>
-                <a href="https://github.com/tuxonice/storyblok-transfers" rel="noopener">github</a>
+                @foreach ($site['footer'] as $item)
+                    <a href="{{ $item['href'] }}" @if (str_starts_with($item['href'], 'http')) rel="noopener" @endif>{{ $item['label'] }}</a>
+                @endforeach
             </nav>
         </div>
     </footer>

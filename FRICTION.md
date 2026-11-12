@@ -31,6 +31,57 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - `PostTransfer::getAuthor(): ?string` and `getCategories(): array` (uuids). Resolving them needs `RelationMap` from the
   story envelope. To be exercised in step 4.
 
+## 5. Per-call options replace the defaults as a whole
+
+- **Tried:** configure `StoryblokContent` with `Version::Draft` as the default, then read with
+  `(new ContentOptions())->withResolveRelations([...])`.
+- **Happened:** that call silently reads the *published* version again, because the per-call `ContentOptions` replaces
+  the defaults instead of merging into them. Documented, but an easy way to lose draft mode on exactly the calls that
+  resolve relations.
+- **Did instead:** `Blog::options()` always builds `new ContentOptions(Version::from(config('storyblok.version')))` and
+  every call starts from it.
+- **Suggestion:** a `StoryblokContent::options()` that returns a copy of the defaults, or merge per-call options onto
+  the defaults.
+
+## 6. Reading time needs the full body, so listings cannot drop it
+
+- **Tried:** keep home listings light with `excludingFields: ['body']`.
+- **Happened:** read time is computed from the richtext, so the listing has to load every post's body.
+- **Did instead:** load bodies in listings (10 per page, cached for five minutes).
+- **Suggestion:** none for the package; this is a consequence of "read time is not stored". Storing it as a field
+  would be the alternative.
+
+## 7. Relations: a loop per field, and a `StoryTransfer` check every time
+
+- **Tried:** show a post's author and categories.
+- **Happened:** `getRelation()` returns `StoryTransfer|array|null` and takes one uuid, so each multi-reference field
+  is a loop with an `instanceof StoryTransfer` check, and `getContent()` is typed as the generic transfer.
+- **Did instead:** one `post()` mapper in `App\Blog\Blog` does the loops and narrows the types.
+- **Suggestion:** `getRelations(array $uuids): list<StoryTransfer>` (skipping unresolved ones), and a typed variant such as
+  `getRelation($uuid, AuthorTransfer::class)`.
+
+## 8. No ready-made fake for tests
+
+- **Tried:** feature-test the routes without the network.
+- **Happened:** `ContentClient` is a clean seam, but I had to write about 120 lines
+  (`tests/Support/FakeContentClient.php`) to emulate story-by-slug, story-by-uuid, listings and `resolve_relations`.
+- **Suggestion:** ship an in-memory `ArrayContentClient` (or a `StoryblokContent::fake()`) for application tests.
+
+## 9. Turning a `LinkTransfer` into an href
+
+- **Tried:** render nav links from `nav_link` bloks.
+- **Happened:** a `multilink` can be `story`, `url`, `email` or `asset`, each with its own field to read, so I wrote a
+  `match` on `getLinktype()` (`Blog::href()`).
+- **Suggestion:** `LinkTransfer::getHref()` that does this, with story links as a root-relative path.
+
+## 10. Embedded blocks: `getBloks()` is keyed by blok id and holds lists
+
+- **Tried:** turn richtext `blok` nodes into rendered components.
+- **Happened:** the node carries an id and `getBloks()[$id]` is a *list* of components (one blok node can hold several),
+  so every render site looks the id up and loops. It works and is documented; it just takes glue
+  (`App\Blog\RichtextBlocks`, temporary until step 5).
+- **Suggestion:** a walk helper that yields `[node, components]` pairs, so renderers do not index by id themselves.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

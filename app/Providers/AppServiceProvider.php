@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Blog\Blog;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Tlab\StoryblokTransfers\Content\ContentOptions;
 use Tlab\StoryblokTransfers\Content\StoryblokContent;
@@ -30,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->singleton(Blog::class);
+
+        View::composer(['layouts.app', 'home.index', 'posts.show'], fn ($view) => $view->with('site', app(Blog::class)->site()));
     }
 }

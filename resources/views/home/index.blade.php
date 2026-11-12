@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container-xl">
+    @if ($featured)
     <section class="featured row g-5 align-items-center py-5">
         <div class="col-lg-7">
             <p class="eyebrow">// featured</p>
@@ -14,12 +15,16 @@
             <figure class="code-panel">
                 <div class="strip">app/Http/Controllers/PostController.php</div>
                 <pre><code><span class="tk-var">$post</span> = <span class="tk-var">$storyblok</span>->stories()
-    ->bySlug(<span class="tk-str">'posts/'</span>.<span class="tk-var">$slug</span>, <span class="tk-class">PostTransfer</span>::class);
+    ->bySlug(
+        <span class="tk-str">'posts/'</span>.<span class="tk-var">$slug</span>,
+        <span class="tk-class">PostTransfer</span>::class,
+    );
 
 <span class="tk-var">$title</span> = <span class="tk-var">$post</span>?->getContent()->getTitle();</code></pre>
             </figure>
         </div>
     </section>
+    @endif
 
     <div class="with-sidebar pb-4">
         <section aria-labelledby="latest">
@@ -31,15 +36,23 @@
                 <x-post-row :post="$post" />
             @endforeach
             <nav class="pager" aria-label="Pagination">
-                <span class="disabled">← newer</span>
-                <a href="#">older →</a>
+                @if ($hasNewer)
+                    <a href="{{ $page > 2 ? route('home', ['page' => $page - 1]) : route('home') }}">← newer</a>
+                @else
+                    <span class="disabled">← newer</span>
+                @endif
+                @if ($hasOlder)
+                    <a href="{{ route('home', ['page' => $page + 1]) }}">older →</a>
+                @else
+                    <span class="disabled">older →</span>
+                @endif
             </nav>
         </section>
 
         <aside aria-label="Sidebar">
             <div class="sidebar-block">
                 <p class="eyebrow">// about</p>
-                <p>{{ $site['about'] }}</p>
+                <p>{{ $intro }}</p>
             </div>
             <div class="sidebar-block">
                 <p class="eyebrow">// categories</p>
