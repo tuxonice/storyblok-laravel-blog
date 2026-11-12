@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StoryblokWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -15,3 +16,4 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('cat
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/feed.xml', FeedController::class)->name('feed');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::post('/webhooks/storyblok', StoryblokWebhookController::class)->middleware('throttle:60,1')->name('webhooks.storyblok');

@@ -24,4 +24,14 @@ return [
     'definitions_path' => resource_path('storyblok'),
 
     'cache_store' => 'storyblok',
+
+    // Seconds a published read is served from the cache without asking Storyblok.
+    'cache_fresh_for' => (int) env('STORYBLOK_CACHE_FRESH_FOR', 300),
+
+    // Seconds beyond that a copy is kept to be served if Storyblok fails.
+    'cache_keep_stale_for' => (int) env('STORYBLOK_CACHE_KEEP_STALE_FOR', 86400),
+
+    // Secret set on the Storyblok webhook (Settings -> Webhooks). Storyblok signs
+    // each request with it; the endpoint refuses everything while it is empty.
+    'webhook_secret' => env('STORYBLOK_WEBHOOK_SECRET'),
 ];

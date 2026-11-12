@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Storyblok cannot send a CSRF token; the webhook is authenticated by its signature instead.
+        $middleware->preventRequestForgery(except: ['webhooks/storyblok']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -110,6 +110,35 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** have `all()` walk the pages the way `datasources()->entries()` already does ("every entry is
   returned; the package fetches all pages for you").
 
+## 14. Cache invalidation is all-or-nothing
+
+- **Tried:** purge only what a publish changed (the checked-in question: is there an explicit purge-on-publish?).
+- **Happened:** there is no per-key purge. `clearCache()` empties the whole cache it was given, so every webhook
+  (including a typo fix in one post) throws away every cached read, and the next visitors pay for all of them. Fine for
+  a small blog; with many stories it means a burst of requests against the 50 req/s Delivery API limit after each publish.
+- **Did instead:** a dedicated `storyblok` file cache store, so clearing it cannot touch sessions or anything else, and
+  `POST /webhooks/storyblok` calls `clearCache()`.
+- **Suggestion:** `forget(string $fullSlug)` (story, plus listings and the links tree, which depend on it), or tagging
+  entries by story uuid so a webhook payload can invalidate precisely.
+
+## 15. Timings and logger are not reachable through `create()`
+
+- **Tried:** configure the TTLs from `config/storyblok.php` and log when an old copy is served.
+- **Happened:** `StoryblokContent::create(..., cache:)` builds the caching client with fixed defaults and no logger, so I
+  build `StoryblokContentClient` and `CachingContentClient` by hand and pass them to `usingClient()`
+  (`AppServiceProvider`). Documented, but it means the one-liner setup is not enough for production, where you want the
+  stale-served warning in your logs.
+- **Suggestion:** `create()` accepts `freshFor`, `keepStaleFor` and `logger`, or a small `CacheOptions` value.
+
+## 16. Webhook signature checking is left to the app
+
+- **Tried:** verify Storyblok's webhook signature.
+- **Happened:** the package documents the scheme (hex HMAC-SHA1 of the raw body in `webhook-signature`) but ships no
+  verifier, so the comparison lives in my controller (`hash_hmac` + `hash_equals`). I took the scheme from the package
+  docs; I could not check it against a real signed webhook from this space.
+- **Suggestion:** `WebhookVerifier::isValid(string $rawBody, ?string $signature, string $secret): bool`, so everyone
+  gets the constant-time comparison right.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

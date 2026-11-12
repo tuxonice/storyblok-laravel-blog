@@ -6,7 +6,7 @@ export WWWUSER  ?= $(shell id -u)
 export WWWGROUP ?= $(shell id -g)
 
 .DEFAULT_GOAL := help
-.PHONY: help start stop down restart ps logs shell install setup dev build test test-filter lint lint-fix migrate cache-clear artisan storyblok-login storyblok-pull storyblok-push storyblok-datasources storyblok-stories storyblok-generate
+.PHONY: help start stop down restart ps logs shell install setup dev build test test-filter lint lint-fix migrate cache-clear artisan storyblok-login storyblok-pull storyblok-push storyblok-datasources storyblok-stories storyblok-clear-cache storyblok-generate
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[33m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -88,6 +88,9 @@ storyblok-datasources: ## Push storyblok/datasources/<space-id>/datasources.json
 
 storyblok-stories: ## Create/update the sample stories (storyblok/stories/stories.json)
 	$(SAIL) artisan storyblok:push-stories
+
+storyblok-clear-cache: ## Clear cached Storyblok reads (next requests fetch fresh content)
+	$(SAIL) artisan storyblok:clear-cache
 
 storyblok-generate: ## Generate transfer classes from the space's schema
 	$(SAIL) composer storyblok:generate

@@ -23,6 +23,9 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="STORYBLOK_SPACE_ID" value="340703"/>
+        <env name="STORYBLOK_DELIVERY_TOKEN" value="test-delivery-token"/>
+        <env name="STORYBLOK_WEBHOOK_SECRET" value="test-webhook-secret"/>
         <env name="DB_DATABASE" value="testing"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>

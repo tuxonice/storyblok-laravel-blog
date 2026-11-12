@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Tlab\StoryblokTransfers\Content\StoryblokContent;
 use Tlab\StoryblokTransfers\StoryblokTransferGenerator;
 
 Artisan::command('inspire', function () {
@@ -24,3 +25,13 @@ Artisan::command('storyblok:generate', function () {
 
     $this->info(sprintf('Generated %d classes in %s.', count($result->componentNames), config('storyblok.output_path')));
 })->purpose('Generate transfer classes from the Storyblok component schemas');
+
+Artisan::command('storyblok:clear-cache', function (StoryblokContent $storyblok) {
+    if (! $storyblok->clearCache()) {
+        $this->error('The Storyblok cache could not be cleared.');
+
+        return self::FAILURE;
+    }
+
+    $this->info('Storyblok cache cleared.');
+})->purpose('Clear cached Storyblok reads so the next requests fetch fresh content');
