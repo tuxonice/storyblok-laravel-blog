@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 // HTML pages: draft mode (Storyblok Visual Editor) can apply here, never to the feed, sitemap or webhook.
 Route::middleware(DetectDraftMode::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
+    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('categories.show');

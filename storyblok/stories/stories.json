@@ -599,8 +599,8 @@
           "link": {
             "fieldtype": "multilink",
             "linktype": "url",
-            "url": "/",
-            "cached_url": "/"
+            "url": "/posts",
+            "cached_url": "/posts"
           }
         },
         {

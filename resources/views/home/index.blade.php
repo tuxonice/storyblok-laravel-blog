@@ -30,7 +30,7 @@
         <section aria-labelledby="latest">
             <div class="section-head">
                 <h2 id="latest">Latest posts</h2>
-                <a href="{{ route('home') }}">all posts</a>
+                <a href="{{ route('posts.index') }}">all posts</a>
             </div>
             @foreach ($posts as $post)
                 <x-post-row :post="$post" />

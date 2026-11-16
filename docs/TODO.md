@@ -53,7 +53,9 @@ Strike through or delete an item when it is done.
 - **Still undesigned.** There is no search and no tag pages, and no authors index (`~/authors` is not a link).
 - **Reading time.** Every listing loads each post's full body to compute it (`FRICTION.md` entry 6). Storing it as a
   field would avoid that.
-- **No `/posts` page.** The `~/posts` breadcrumb and the "all posts" link both go to the home page.
+- ~~No `/posts` page.~~ `/posts` lists every post newest first, with pagination and the sidebar, and is in the
+  sitemap. The "all posts" link and the `~/posts` breadcrumb point to it. **In Storyblok, change the `posts` menu link
+  in the `settings` story from `/` to `/posts`** (the repo's seed and the fallback menu already use `/posts`).
 - ~~Accessibility.~~ Audited on 2026-11-12 (Lighthouse on home, a post and the 404, plus a script over home, a post,
   an author page and the 404 at 375px and desktop). Lighthouse accessibility is 100 everywhere. Text contrast is
   at least 4.5:1 on every text node, targets outside running text are at least 44px, there is one H1 and no skipped

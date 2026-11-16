@@ -78,6 +78,14 @@ class FakeContentClient implements ContentClient
         }
     }
 
+    /** Drops every story whose full slug starts with the prefix, e.g. 'posts/' for a blog with no posts yet. */
+    public function withoutStories(string $prefix): static
+    {
+        $this->stories = array_filter($this->stories, fn (string $slug) => ! str_starts_with($slug, $prefix), ARRAY_FILTER_USE_KEY);
+
+        return $this;
+    }
+
     public function get(string $path, array $query): ContentResponse
     {
         $this->requests[] = ['path' => $path, 'query' => $query];

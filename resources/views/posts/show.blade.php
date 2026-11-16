@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-xl pt-4">
     <nav class="breadcrumb-mono mb-3" aria-label="Breadcrumb">
-        <a href="{{ route('home') }}">~/posts</a> / {{ $post['slug'] }}
+        <a href="{{ route('posts.index') }}">~/posts</a> / {{ $post['slug'] }}
     </nav>
     <h1 class="post-title mb-3">{{ $post['title'] }}</h1>
     <div class="meta-row meta-mono mb-4">

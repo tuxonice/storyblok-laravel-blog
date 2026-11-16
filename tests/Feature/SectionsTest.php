@@ -83,6 +83,61 @@ class SectionsTest extends TestCase
         $this->get('/categories/nope')->assertNotFound();
     }
 
+    public function test_posts_page_lists_every_post_newest_first(): void
+    {
+        $this->fakeStoryblok();
+
+        $this->get('/posts')
+            ->assertOk()
+            ->assertSee('~/posts')
+            ->assertSee('<h1 class="page-title" id="posts-title">All posts</h1>', false)
+            ->assertSee('5 posts, newest first')
+            ->assertSeeInOrder([
+                'Typed content from a headless CMS',
+                'Caching published reads without surprises',
+                'Rendering richtext with embedded blocks',
+                'One Blade component per block',
+                'Sitemaps from the links endpoint',
+            ])
+            ->assertSee('<title>All posts · your-blog</title>', false)
+            ->assertSee('<link rel="canonical" href="'.url('/posts').'">', false)
+            ->assertSee('// categories', false);
+    }
+
+    public function test_posts_page_paginates_and_404s_past_the_end(): void
+    {
+        $this->fakeStoryblok(['home' => ['posts_per_page' => 3]]);
+
+        $this->get('/posts')
+            ->assertOk()
+            ->assertSee('href="'.url('/posts?page=2').'" rel="next"', false)
+            ->assertDontSee('One Blade component per block');
+
+        $this->get('/posts?page=2')
+            ->assertOk()
+            ->assertSeeInOrder(['One Blade component per block', 'Sitemaps from the links endpoint'])
+            ->assertDontSee('Typed content from a headless CMS')
+            ->assertSee('href="'.url('/posts').'" rel="prev"', false)
+            ->assertSee('<link rel="canonical" href="'.url('/posts?page=2').'">', false);
+
+        $this->get('/posts?page=3')->assertNotFound();
+    }
+
+    public function test_posts_page_without_posts_is_an_empty_page_not_a_404(): void
+    {
+        $this->fakeStoryblok()->withoutStories('posts/');
+
+        $this->get('/posts')->assertOk()->assertSee('No posts yet.')->assertDontSee('older →');
+    }
+
+    public function test_all_posts_links_and_the_breadcrumb_point_to_the_posts_page(): void
+    {
+        $this->fakeStoryblok();
+
+        $this->get('/')->assertSee('<a href="'.url('/posts').'">all posts</a>', false);
+        $this->get('/posts/typed-content-from-storyblok')->assertSee('<a href="'.url('/posts').'">~/posts</a>', false);
+    }
+
     public function test_about_page_renders_the_richtext(): void
     {
         $this->fakeStoryblok();
@@ -99,6 +154,9 @@ class SectionsTest extends TestCase
         $this->fakeStoryblok();
 
         $this->get('/categories/laravel')->assertSee('href="/categories" class="active"', false);
+        $this->get('/posts')->assertSee('href="/posts" class="active"', false);
+        $this->get('/posts/typed-content-from-storyblok')->assertSee('href="/posts" class="active"', false);
+        $this->get('/')->assertDontSee('class="active"', false);
         $this->get('/about')->assertSee('href="/about" class="active"', false);
     }
 
@@ -156,7 +214,7 @@ class SectionsTest extends TestCase
             $locs[(string) $url->loc] = isset($url->lastmod) ? (string) $url->lastmod : null;
         }
 
-        foreach (['/', '/categories', '/about', '/categories/laravel', '/authors/sample-author', '/posts/typed-content-from-storyblok', '/posts/sitemaps-from-the-links-endpoint'] as $path) {
+        foreach (['/', '/posts', '/categories', '/about', '/categories/laravel', '/authors/sample-author', '/posts/typed-content-from-storyblok', '/posts/sitemaps-from-the-links-endpoint'] as $path) {
             $this->assertArrayHasKey($path === '/' ? url('/') : url($path), $locs, "missing {$path}");
         }
 
@@ -166,9 +224,8 @@ class SectionsTest extends TestCase
             $this->assertStringNotContainsString('/home', $loc);
         }
 
-        // The `authors` and `posts` folders have no page of their own. (`/categories` does: it is the index.)
+        // The `authors` folder has no page of their own. (`/posts` and `/categories` do: they are the indexes.)
         $this->assertArrayNotHasKey(url('/authors'), $locs);
-        $this->assertArrayNotHasKey(url('/posts'), $locs);
 
         // Posts carry a last-modified date, other pages do not.
         $this->assertNotNull($locs[url('/posts/typed-content-from-storyblok')]);

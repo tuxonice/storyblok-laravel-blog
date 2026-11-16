@@ -13,6 +13,7 @@ use Tlab\StoryblokTransfers\Client\ResourceNotFoundException;
 use Tlab\StoryblokTransfers\Client\StoryblokApiException;
 use Tlab\StoryblokTransfers\Content\ContentOptions;
 use Tlab\StoryblokTransfers\Content\StoryblokContent;
+use Tlab\StoryblokTransfers\Content\StoryList;
 use Tlab\StoryblokTransfers\Content\StoryQuery;
 use Tlab\StoryblokTransfers\Content\StoryTransfer;
 use Tlab\StoryblokTransfers\Transfers\LinkTransfer;
@@ -67,7 +68,7 @@ class Blog
             'name' => (string) config('app.name'),
             'ogImage' => null,
             'nav' => [
-                ['label' => 'posts', 'href' => '/'],
+                ['label' => 'posts', 'href' => '/posts'],
                 ['label' => 'categories', 'href' => '/categories'],
                 ['label' => 'about', 'href' => '/about'],
                 ['label' => 'rss', 'href' => '/feed.xml'],
@@ -84,14 +85,7 @@ class Blog
     {
         $index = $this->index();
         $perPage = $this->postsPerPage();
-
-        $list = $this->storyblok->stories()->findBy(new StoryQuery(
-            startsWith: 'posts/',
-            sortBy: 'content.published_at:desc',
-            page: max(1, $page),
-            perPage: $perPage,
-            options: $this->options(),
-        ), PostTransfer::class);
+        $list = $this->newest($page, $perPage);
 
         $posts = array_map(fn (StoryTransfer $s) => $this->post($s), $list->getStories());
 
@@ -189,6 +183,45 @@ class Blog
         ];
     }
 
+    /**
+     * Every post, newest first: the /posts page. Null for a page past the end.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function posts(int $page): ?array
+    {
+        $perPage = $this->postsPerPage();
+        $list = $this->newest($page, $perPage);
+
+        $posts = array_map(fn (StoryTransfer $s) => $this->post($s), $list->getStories());
+
+        if ($posts === [] && $page > 1) {
+            return null;
+        }
+
+        return [
+            'intro' => (string) $this->index()?->getIntro(),
+            'posts' => $posts,
+            'categories' => $this->categories(),
+            'total' => $list->getTotal(),
+            'page' => $list->getPage(),
+            'hasNewer' => $list->getPage() > 1,
+            'hasOlder' => $list->getPage() * $perPage < $list->getTotal(),
+        ];
+    }
+
+    /** One page of posts, newest first. */
+    private function newest(int $page, int $perPage): StoryList
+    {
+        return $this->storyblok->stories()->findBy(new StoryQuery(
+            startsWith: 'posts/',
+            sortBy: 'content.published_at:desc',
+            page: max(1, $page),
+            perPage: $perPage,
+            options: $this->options(),
+        ), PostTransfer::class);
+    }
+
     /** @return array{title: string, body: string}|null */
     public function about(): ?array
     {
@@ -248,7 +281,11 @@ class Blog
             $lastmod['/'.$story->getFullSlug()] = $story->getPublishedAt();
         }
 
-        $entries = [['path' => '/', 'lastmod' => null], ['path' => '/categories', 'lastmod' => null]];
+        $entries = [
+            ['path' => '/', 'lastmod' => null],
+            ['path' => '/posts', 'lastmod' => null],
+            ['path' => '/categories', 'lastmod' => null],
+        ];
 
         foreach ($this->storyblok->links()->all(null, $this->options()) as $link) {
             if ($link->isFolder() || ! $link->isPublished()) {
