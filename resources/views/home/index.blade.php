@@ -3,7 +3,9 @@
 @section('content')
 <div class="container-xl">
     @if ($featured)
-    <section class="featured row g-5 align-items-center py-5">
+    {{-- The row sits inside the padded section: a .row carries a negative top margin, and on the section itself it would pull the box over the header and swallow clicks on the nav. --}}
+    <section class="featured py-5">
+      <div class="row g-5 align-items-center">
         <div class="col-lg-7">
             <p class="eyebrow">// featured</p>
             <h1>{{ $featured['title'] }}</h1>
@@ -23,6 +25,7 @@
 <span class="tk-var">$title</span> = <span class="tk-var">$post</span>?->getContent()->getTitle();</code></pre>
             </figure>
         </div>
+      </div>
     </section>
     @endif
 

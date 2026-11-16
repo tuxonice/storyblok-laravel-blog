@@ -23,6 +23,17 @@ class PagesTest extends TestCase
             ->assertSee('Laravel');                     // a category chip
     }
 
+    public function test_the_featured_section_is_not_a_bootstrap_row(): void
+    {
+        $this->fakeStoryblok();
+
+        // A .row has a negative top margin; on the padded section itself it overlaps the header and the nav links stop working.
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('<section class="featured py-5">', false)
+            ->assertDontSee('class="featured row', false);
+    }
+
     public function test_home_lists_newest_posts_first(): void
     {
         $this->fakeStoryblok();
