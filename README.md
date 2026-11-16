@@ -143,12 +143,90 @@ for package problems, and "ask before adding dependencies".
   every other environment tells crawlers to stay away.
 - Use the **public** delivery token. Keep `STORYBLOK_DEFAULT_VERSION=published`. Do not deploy the management or CLI tokens.
 - Build assets (`npm ci && npm run build`) and run `php artisan optimize` (caches config, routes and views).
-- Configure trusted proxies: the sitemap, feed, canonical URLs and `robots.txt` use the host of the request.
+  `deploy/deploy.sh` does both; see [Deploying to a server](#deploying-to-a-server).
+- Behind a proxy or load balancer, configure trusted proxies: the sitemap, feed, canonical URLs, `robots.txt` and the
+  IP allowlist use the request's host and address. Apache serving the site directly needs nothing.
 - Serve over HTTPS (the Visual Editor needs it; the draft cookie is `SameSite=None; Secure`).
 - Set the webhook secret, or content changes take up to five minutes to appear.
 - To keep the site private before launch, set `ALLOWED_IPS` to a comma-separated list of IPs or CIDR ranges. Everyone
   else gets a plain 403; the webhook and `/up` stay open. Empty means public. Behind a proxy, configure trusted proxies
   first, or every visitor appears to come from the proxy's address.
+
+## Deploying to a server
+
+`deploy/deploy.sh` runs on the server (written for Ubuntu with Apache and PHP-FPM, such as a Hetzner Cloud server).
+Each deploy clones the branch into its own folder, installs Composer packages without dev dependencies, builds the
+assets, runs the migrations and `php artisan optimize`, and only then switches the `current` symlink to it. A failed
+step deletes the new folder and leaves the live site as it was.
+
+```
+/var/www/example.com/
+├── deploy.sh
+├── current -> releases/20261116105514   # Apache's DocumentRoot is current/public
+├── releases/                            # the newest five are kept
+└── shared/
+    ├── .env                             # production settings
+    ├── storage/                         # logs, file caches (including Storyblok's), compiled views
+    └── database/database.sqlite         # sessions and the default cache store
+```
+
+### One-time server setup
+
+1. Packages: Apache, PHP 8.4 with FPM, Git, Composer and Node.js 22 (for the asset build).
+
+   ```bash
+   sudo apt install apache2 git unzip php8.4-fpm php8.4-cli php8.4-sqlite3 php8.4-mbstring php8.4-xml php8.4-curl
+   # Composer: https://getcomposer.org/download/   Node.js 22: https://nodejs.org/en/download (or NodeSource)
+   ```
+
+2. A deploy user that shares the web server's group, and the base folder with the group bit set, so files the deploy
+   creates stay writable by PHP-FPM (`www-data`):
+
+   ```bash
+   sudo adduser --disabled-password deploy
+   sudo usermod -aG www-data deploy
+   sudo mkdir -p /var/www/example.com
+   sudo chown deploy:www-data /var/www/example.com
+   sudo chmod 2775 /var/www/example.com
+   ```
+
+3. Repository access: the default `DEPLOY_REPO` is the public HTTPS URL, so no key is needed. If the repository
+   becomes private, add a read-only deploy key on GitHub and set `DEPLOY_REPO` to the SSH URL
+   (`git@github.com:tuxonice/storyblok-laravel-blog.git`).
+
+4. Let the deploy user reload PHP-FPM without a password (`sudo visudo -f /etc/sudoers.d/deploy`):
+
+   ```
+   deploy ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.4-fpm
+   ```
+
+5. Apache: follow the steps in [`deploy/apache.conf.example`](deploy/apache.conf.example), including Certbot for HTTPS.
+
+6. Copy the script to the server and run it once. It creates `shared/.env` with production values and a new
+   `APP_KEY`, then stops:
+
+   ```bash
+   scp deploy/deploy.sh deploy@your-server:/var/www/example.com/
+   ssh deploy@your-server /var/www/example.com/deploy.sh
+   ```
+
+   Fill in `APP_URL`, the delivery and preview tokens, `STORYBLOK_WEBHOOK_SECRET` and `ALLOWED_IPS` in
+   `/var/www/example.com/shared/.env`, and delete the management and CLI token lines.
+
+### Every deploy
+
+```bash
+ssh deploy@your-server 'RELOAD_CMD="sudo systemctl reload php8.4-fpm" /var/www/example.com/deploy.sh main'
+```
+
+- Any branch works: `deploy.sh feat/something`.
+- `deploy.sh rollback` switches back to the previous release. It does not undo migrations.
+- Other settings, all optional: `DEPLOY_PATH`, `DEPLOY_REPO`, `KEEP_RELEASES`, `PHP`, `COMPOSER`. `deploy.sh --help`
+  lists them.
+- Reload PHP-FPM (`RELOAD_CMD`) on every deploy: PHP caches resolved paths and compiled code, and can keep serving the
+  previous release for a few minutes without it.
+- Editing `shared/.env` needs a deploy (or `php artisan config:cache` in `current/`), because the config is cached.
+- The script lives outside the releases, so copy it to the server again after changing it.
 
 ## More
 

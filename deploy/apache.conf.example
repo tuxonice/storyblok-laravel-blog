@@ -1,0 +1,39 @@
+# Apache virtual host for the blog, served by PHP-FPM.
+#
+# 1. Replace every example.com with the real domain.
+# 2. Save as /etc/apache2/sites-available/example.com.conf
+# 3. sudo a2enmod rewrite headers proxy_fcgi setenvif
+#    sudo a2enconf php8.4-fpm
+#    sudo a2ensite example.com
+#    sudo apachectl configtest && sudo systemctl reload apache2
+# 4. HTTPS: sudo certbot --apache -d example.com
+#    Certbot copies this block into an :443 one and redirects HTTP to HTTPS.
+#    The Visual Editor needs HTTPS (the draft cookie is SameSite=None; Secure).
+
+<VirtualHost *:80>
+    ServerName example.com
+    # ServerAlias www.example.com
+
+    # "current" is a symlink to the live release, switched by deploy.sh.
+    DocumentRoot /var/www/example.com/current/public
+
+    # The whole base folder: Apache matches <Directory> against the path as
+    # written, and the symlink target changes on every deploy.
+    <Directory /var/www/example.com>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/run/php/php8.4-fpm.sock|fcgi://localhost"
+    </FilesMatch>
+
+    # Long-lived caching for the hashed Vite assets.
+    <Directory /var/www/example.com/current/public/build/assets>
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/example.com-error.log
+    CustomLog ${APACHE_LOG_DIR}/example.com-access.log combined
+</VirtualHost>

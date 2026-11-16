@@ -73,5 +73,6 @@ Strike through or delete an item when it is done.
 - ~~PHP version.~~ `composer.json` now requires `^8.4`, matching the lock file (Symfony 8 needs 8.4.1 or newer), CI
   and the README.
 - **Security headers.** There is no CSP or similar beyond the draft-mode `frame-ancestors`.
-- **Deployment.** The README lists production steps (`php artisan optimize`, asset build), but no deploy pipeline or
-  server configuration exists.
+- ~~Deployment.~~ `deploy/deploy.sh` deploys to an Apache + PHP-FPM server with one folder per release, an atomic
+  switch and `rollback`; `deploy/apache.conf.example` is the virtual host. Tested in a Sail container, not yet on the
+  real server. There is still no CI-triggered deploy: it runs by hand over SSH.
