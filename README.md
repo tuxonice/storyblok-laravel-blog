@@ -146,6 +146,9 @@ for package problems, and "ask before adding dependencies".
 - Configure trusted proxies: the sitemap, feed, canonical URLs and `robots.txt` use the host of the request.
 - Serve over HTTPS (the Visual Editor needs it; the draft cookie is `SameSite=None; Secure`).
 - Set the webhook secret, or content changes take up to five minutes to appear.
+- To keep the site private before launch, set `ALLOWED_IPS` to a comma-separated list of IPs or CIDR ranges. Everyone
+  else gets a plain 403; the webhook and `/up` stay open. Empty means public. Behind a proxy, configure trusted proxies
+  first, or every visitor appears to come from the proxy's address.
 
 ## More
 

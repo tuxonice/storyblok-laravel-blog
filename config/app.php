@@ -123,4 +123,20 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | IP Allowlist
+    |--------------------------------------------------------------------------
+    |
+    | Comma-separated IP addresses or CIDR ranges (IPv4 or IPv6) that may open
+    | the site. Everyone else gets a 403. Leave it empty to turn the check off.
+    | The Storyblok webhook and the /up health check are always reachable.
+    |
+    */
+
+    'allowed_ips' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('ALLOWED_IPS', '')),
+    ))),
+
 ];
