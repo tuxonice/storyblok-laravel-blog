@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $error['title'] }} · {{ config('app.name') }}</title>
-    <script>try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+    <script nonce="{{ Vite::cspNonce() }}">try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
     <style>
         :root { --bg: #0e1116; --surface: #151a21; --border: #262d37; --text: #e8ecf1; --muted: #9aa4b2; --accent: #f5a524; --ink: #0e1116; color-scheme: dark; }
         :root[data-theme="light"] { --bg: #ffffff; --surface: #f6f8fa; --border: #dfe3e9; --text: #0e1116; --muted: #566170; --accent: #8f5700; color-scheme: light; }

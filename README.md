@@ -146,7 +146,10 @@ for package problems, and "ask before adding dependencies".
   `deploy/deploy.sh` does both; see [Deploying to a server](#deploying-to-a-server).
 - Behind a proxy or load balancer, configure trusted proxies: the sitemap, feed, canonical URLs, `robots.txt` and the
   IP allowlist use the request's host and address. Apache serving the site directly needs nothing.
-- Serve over HTTPS (the Visual Editor needs it; the draft cookie is `SameSite=None; Secure`).
+- Serve over HTTPS (the Visual Editor needs it; the draft cookie is `SameSite=None; Secure`). The app sends HSTS on
+  HTTPS requests, along with a Content Security Policy and the other security headers (`SecurityHeaders` middleware).
+  A new inline `<script>` needs `nonce="{{ Vite::cspNonce() }}"`, and a new external host must be added to the
+  policy, or the browser blocks it.
 - Set the webhook secret, or content changes take up to five minutes to appear.
 - To keep the site private before launch, set `ALLOWED_IPS` to a comma-separated list of IPs or CIDR ranges. Everyone
   else gets a plain 403; the webhook and `/up` stay open. Empty means public. Behind a proxy, configure trusted proxies

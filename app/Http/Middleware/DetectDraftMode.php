@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
  * Switches the request to draft content when it comes from the Storyblok
  * Visual Editor (or follows a link inside it), and keeps that content out of
  * caches and search engines. Applied to the HTML pages only, never to the
- * feed, the sitemap or the webhook.
+ * feed, the sitemap or the webhook. SecurityHeaders reads the same state to let
+ * the Visual Editor frame the page.
  */
 class DetectDraftMode
 {
@@ -37,11 +38,8 @@ class DetectDraftMode
             $response->headers->setCookie($this->draft->cookie($request));
         }
 
-        $origins = implode(' ', array_filter(array_map('trim', explode(',', (string) config('storyblok.editor_origins')))));
-
         $response->headers->set('Cache-Control', 'no-store, private');
         $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
-        $response->headers->set('Content-Security-Policy', "frame-ancestors 'self' {$origins}");
 
         return $response;
     }

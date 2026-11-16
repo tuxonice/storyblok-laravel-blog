@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RestrictToAllowedIps;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // First, so a blocked visitor reaches nothing else (no session, no Storyblok read).
+        // Outermost, so every response gets them, including error and maintenance pages.
+        $middleware->prepend(SecurityHeaders::class);
+        // Before that, so a blocked visitor reaches nothing else (no session, no Storyblok read).
         $middleware->prepend(RestrictToAllowedIps::class);
 
         // Storyblok cannot send a CSRF token; the webhook is authenticated by its signature instead.

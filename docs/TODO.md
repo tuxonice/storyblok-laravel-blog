@@ -72,7 +72,10 @@ Strike through or delete an item when it is done.
 - ~~LICENSE file.~~ Added (MIT, Helder Correia, 2026).
 - ~~PHP version.~~ `composer.json` now requires `^8.4`, matching the lock file (Symfony 8 needs 8.4.1 or newer), CI
   and the README.
-- **Security headers.** There is no CSP or similar beyond the draft-mode `frame-ancestors`.
+- ~~Security headers.~~ `SecurityHeaders` sends a nonce-based Content Security Policy, `X-Content-Type-Options`,
+  `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `X-Frame-Options` (dropped in draft mode so the
+  Visual Editor can frame the page) and HSTS over HTTPS. Home, a post and the 404 showed no CSP violations in Chrome;
+  draft mode inside the real Visual Editor is still untested.
 - ~~Deployment.~~ `deploy/deploy.sh` deploys to an Apache + PHP-FPM server with one folder per release, an atomic
   switch and `rollback`; `deploy/apache.conf.example` is the virtual host. Tested in a Sail container, not yet on the
   real server. There is still no CI-triggered deploy: it runs by hand over SSH.

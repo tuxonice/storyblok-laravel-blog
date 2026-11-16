@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.seo')
     {{-- Apply a saved theme before first paint so there is no flash. Dark is the default. --}}
-    <script>try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-bs-theme', t); } catch (e) {}</script>
+    <script nonce="{{ Vite::cspNonce() }}">try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-bs-theme', t); } catch (e) {}</script>
     <link rel="preload" href="{{ Vite::asset('resources/fonts/inter-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="alternate" type="application/rss+xml" title="{{ $site['name'] }}" href="{{ route('feed') }}">
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
@@ -55,7 +55,7 @@
     </footer>
     @if ($draftMode ?? false)
         {{-- Inside the Visual Editor's iframe only: reload on save/publish so the editor sees the change. --}}
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             if (window.self !== window.top) {
                 var bridge = document.createElement('script');
                 bridge.src = 'https://app.storyblok.com/f/storyblok-v2-latest.js';

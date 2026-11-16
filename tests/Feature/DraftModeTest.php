@@ -59,7 +59,8 @@ class DraftModeTest extends TestCase
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
         $this->assertStringContainsString('private', $response->headers->get('Cache-Control'));
         $this->assertSame('noindex, nofollow', $response->headers->get('X-Robots-Tag'));
-        $this->assertSame("frame-ancestors 'self' https://app.storyblok.com", $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString("frame-ancestors 'self' https://app.storyblok.com", $response->headers->get('Content-Security-Policy'));
+        $response->assertHeaderMissing('X-Frame-Options');
     }
 
     public function test_the_visual_editor_bridge_is_loaded_in_draft_mode_only(): void
