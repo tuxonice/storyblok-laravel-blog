@@ -84,11 +84,42 @@ class WebhookTest extends TestCase
 
     public function test_the_endpoint_refuses_everything_while_no_secret_is_configured(): void
     {
-        config(['storyblok.webhook_secret' => '']);
+        config(['storyblok.webhook_secret' => '', 'storyblok.webhook_key' => '']);
 
         // Even a signature made with an empty secret must not work.
         $this->webhook(['action' => 'published'], signWith: '')->assertStatus(503);
         $this->webhook(['action' => 'published'])->assertStatus(503);
+
+        $this->assertTrue($this->cached());
+    }
+
+    public function test_a_correct_url_key_clears_the_cache_without_a_secret(): void
+    {
+        config(['storyblok.webhook_secret' => '', 'storyblok.webhook_key' => 'url-key']);
+
+        $this->call('POST', '/webhooks/storyblok?key=url-key', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{"action":"published"}')
+            ->assertOk()
+            ->assertExactJson(['cleared' => true]);
+
+        $this->assertFalse($this->cached());
+    }
+
+    public function test_a_wrong_or_missing_url_key_is_refused(): void
+    {
+        config(['storyblok.webhook_secret' => '', 'storyblok.webhook_key' => 'url-key']);
+
+        $this->call('POST', '/webhooks/storyblok?key=nope', [], [], [], [], '{}')->assertForbidden();
+        $this->call('POST', '/webhooks/storyblok', [], [], [], [], '{}')->assertForbidden();
+        $this->call('POST', '/webhooks/storyblok?key[]=url-key', [], [], [], [], '{}')->assertForbidden();
+
+        $this->assertTrue($this->cached());
+    }
+
+    public function test_an_empty_url_key_never_matches(): void
+    {
+        config(['storyblok.webhook_secret' => 'a-secret', 'storyblok.webhook_key' => '']);
+
+        $this->call('POST', '/webhooks/storyblok?key=', [], [], [], [], '{}')->assertForbidden();
 
         $this->assertTrue($this->cached());
     }

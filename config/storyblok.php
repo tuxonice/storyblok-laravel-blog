@@ -38,4 +38,8 @@ return [
     // Secret set on the Storyblok webhook (Settings -> Webhooks). Storyblok signs
     // each request with it; the endpoint refuses everything while it is empty.
     'webhook_secret' => env('STORYBLOK_WEBHOOK_SECRET'),
+
+    // Fallback for plans without a webhook secret: a random key added to the webhook URL as `?key=...`.
+    // Weaker than the signature, because the key travels in the URL. Empty turns it off.
+    'webhook_key' => env('STORYBLOK_WEBHOOK_KEY'),
 ];

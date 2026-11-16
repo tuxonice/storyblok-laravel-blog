@@ -192,6 +192,14 @@ Format: what I tried, what happened, what I did instead, suggested change.
 - **Suggestion:** `datasources()->map('tags'): array<string, string>` (value to name, empty when the datasource is
   missing), or at least a consistent empty result for a missing datasource.
 
+## 22. The webhook secret is not available on every plan
+
+- **Tried:** sign-check the webhook with a secret, as the package docs describe.
+- **Happened:** the space's webhook form has no secret field (Storyblok's docs say it is for paid plans), so there is
+  nothing to sign with.
+- **Did instead:** an optional `STORYBLOK_WEBHOOK_KEY` checked against `?key=` in the URL, accepted next to the signature.
+- **Suggestion:** the package's `WebhookVerifier` (entry 16) could document this fallback, or accept a shared key too.
+
 ## Not package-related (Storyblok CLI), kept here so it is not rediscovered
 
 - The CLI wants `<path>/components/<space-id>/components.json` and `<path>/datasources/<space-id>/datasources.json`;

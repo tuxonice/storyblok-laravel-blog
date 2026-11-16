@@ -51,6 +51,7 @@ content. Run `make` to list every command, and `make dev` for Vite hot reload wh
 | `STORYBLOK_MANAGEMENT_TOKEN` | `make storyblok-generate` | Personal access token. **Never deploy it.** |
 | `STORYBLOK_CLI_TOKEN` | `make storyblok-login` and the push targets | Personal access token with `users:read` and write access to components and datasources |
 | `STORYBLOK_WEBHOOK_SECRET` | the webhook | The secret set on the Storyblok webhook. While empty, the webhook endpoint refuses everything |
+| `STORYBLOK_WEBHOOK_KEY` | the webhook | Fallback for plans without a webhook secret: a random key added to the webhook URL as `?key=`. Weaker, as the key travels in the URL |
 | `STORYBLOK_DEFAULT_VERSION` | preview environments | `published` (default) or `draft`. Use `draft` only on a private preview site |
 | `STORYBLOK_CACHE_FRESH_FOR` | caching | Seconds a read is served without asking Storyblok (default 300) |
 | `STORYBLOK_CACHE_KEEP_STALE_FOR` | caching | Seconds an old copy is kept for outages (default 86400) |
@@ -83,7 +84,8 @@ underscore in a field name (`headline_2` is skipped, use `headline_two`).
 ### In Storyblok
 
 1. **Webhook** (Settings, Webhooks): point it at `https://<your-domain>/webhooks/storyblok`, tick the story and
-   datasource events, set a secret and put the same value in `STORYBLOK_WEBHOOK_SECRET`.
+   datasource events, set a secret and put the same value in `STORYBLOK_WEBHOOK_SECRET`. Without a secret field on your plan, set
+   `STORYBLOK_WEBHOOK_KEY` to a random value instead and end the URL with `?key=<that value>`.
 2. **Visual Editor** (Settings, Visual Editor): set the preview location to your site's HTTPS URL, and set the
    "Preview path" of `site_settings`, `blog_index` and `author` to `/` (they have no page of their own).
 
@@ -150,7 +152,7 @@ for package problems, and "ask before adding dependencies".
   HTTPS requests, along with a Content Security Policy and the other security headers (`SecurityHeaders` middleware).
   A new inline `<script>` needs `nonce="{{ Vite::cspNonce() }}"`, and a new external host must be added to the
   policy, or the browser blocks it.
-- Set the webhook secret, or content changes take up to five minutes to appear.
+- Set the webhook secret (or key), or content changes take up to five minutes to appear.
 - To keep the site private before launch, set `ALLOWED_IPS` to a comma-separated list of IPs or CIDR ranges. Everyone
   else gets a plain 403; the webhook and `/up` stay open. Empty means public. Behind a proxy, configure trusted proxies
   first, or every visitor appears to come from the proxy's address.
